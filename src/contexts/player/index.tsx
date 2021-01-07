@@ -1,23 +1,24 @@
+// eslint-disable-next-line no-use-before-define
 import React from 'react'
-import { IContext, IContextData} from './types'
 
-const initialContext:IContext = {
- data:{
-	play:false,
-	musicList:[]
- }
-}
-export const Context = React.createContext<IContext>(initialContext)
+import { Audio } from 'expo-av'
 
-export const Provider:React.FC = ({children})=>{
- const [data,setData] = React.useState<IContextData>({
-	play:false,
-	musicList:[]
- })
+import { ContextType, PlayerState } from './types'
 
- return (
-	<Context.Provider value={{data, setData}}>
-	 {children}
-	</Context.Provider>
- )
+export const PlayerContext = React.createContext<ContextType>(undefined)
+
+export const PlayerProvider: React.FC = ({ children }) => {
+  Audio.setAudioModeAsync({
+    staysActiveInBackground: true
+  })
+  const sound = new Audio.Sound()
+  const [playerState, setPlayerState] = React.useState<PlayerState>({
+    musicList: [],
+    sound
+  })
+  return (
+    <PlayerContext.Provider value={{ playerState, setPlayerState }}>
+      {children}
+    </PlayerContext.Provider>
+  )
 }

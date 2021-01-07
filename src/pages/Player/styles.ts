@@ -1,31 +1,26 @@
 import { StyleSheet } from 'react-native'
 export default StyleSheet.create({
- container:{
-	flex:1,
-	alignItems:'center',
-	marginTop:'10%'
- },
- musicName:{
-	fontWeight:'bold',
-	fontSize:22
- },
- artistName:{
-	fontSize:20
- },
- optionsArea:{
-	flexDirection:'row',
-	justifyContent:'space-between'
- },
- playerControlArea:{
-	width: "80%"
- },
- playerTimeArea:{
-	flexDirection:'row',
-	justifyContent:'space-between'
- },
- playerButtonsArea:{
-	flexDirection:'row',
-	alignItems:'center',
-	justifyContent:'space-between',
- }
+  containerVertical: {
+    flex: 1,
+    alignItems: 'center',
+    marginTop: '10%'
+  },
+  containerHorizontal: {
+    flexDirection: 'row',
+    marginTop: '5%'
+  },
+  controlsAreaVertical: {
+    flex: 1,
+    width: '100%',
+    alignItems: 'center'
+  },
+  controlsAreaHorizontal: {
+    flex: 1,
+    width: '100%',
+    paddingLeft: 12,
+    flexDirection: 'column'
+  },
+  playerControlArea: {
+    width: '80%'
+  }
 })

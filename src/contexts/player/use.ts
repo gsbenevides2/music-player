@@ -1,49 +1,94 @@
-import React from 'react'
+import { useContext } from 'react'
 
-import AsyncStorage from '@react-native-async-storage/async-storage'
-import {Context} from './index'
-import {AsyncStorageData} from './types'
-import {useDatabase} from '../../services/database'
-import {ResultSet} from 'expo-sqlite'
+import { PlayerContext } from '.'
+import { YoutubeService } from '../../services/youtube'
+import { IMusic } from '../../types'
+import { LoadedUsecontext } from './types'
+import { Sound } from 'expo-av/build/Audio'
 
-export const useContext = ()=>{
- const context = React.useContext(Context)
- const databaseService = new DatabaseService()
+export function usePlayerContext(): LoadedUsecontext {
+  const playerContext = useContext(PlayerContext)
+  const youtubeService = new YoutubeService()
 
- async function load () {
-	const database = useDatabase()
-	const data = await AsyncStorage.getItem('@player/context')
-	if(data){
-	 const parsedData = JSON.parse(data) as AsyncStorageData
-	 if(parsedData.musicList && context.setData){
-		const musicDb = await databaseService._execSQL([
-		 {
-			sql:databaseService._createSQLString([
-			 'SELECT * FROM musics',
-			 'WHERE id = ?'
-			]),
-			args:[parsedData.playingActualy.id]
-		 }
-		], false)
-		const  = musicDb.result?.[0] as ResultSet
-		const music = first_music.rows[0]
-		context.setData({
-		 play:false,
-		 musicList:parsedData.musicList as string[],
-		 playingActualy:{
-			...parsedData.playingActualy,
-			title:'string',
-			artist:'string',
-			cover:'string',
-			time:0
-		 }
-		})
-	 }
-	}
- }
-
- return {
-	context,
-	load
- }
+  return {
+    async playMusic() {
+      const sound = playerContext?.playerState.sound as Sound
+      await sound.playAsync()
+    },
+    async pauseMusic() {
+      const sound = playerContext?.playerState.sound as Sound
+      await sound.pauseAsync()
+    },
+    async playNext() {
+      const sound = playerContext?.playerState.sound as Sound
+      const actualIndex = playerContext?.playerState.musicList.findIndex(
+        music => music.id === playerContext.playerState.musicActualy?.id
+      ) as number
+      if (actualIndex !== playerContext?.playerState.musicList.length) {
+        const nextMusic = playerContext?.playerState.musicList[actualIndex + 1]
+        if (nextMusic) {
+          const musicUrl = await youtubeService.getMusicPlayUrl(
+            nextMusic?.youtubeId
+          )
+          await sound.unloadAsync()
+          await sound.loadAsync(
+            {
+              uri: musicUrl
+            },
+            { shouldPlay: true }
+          )
+          playerContext?.setPlayerState({
+            ...playerContext.playerState,
+            sound,
+            musicActualy: nextMusic
+          })
+        }
+      }
+    },
+    async playPrevious() {
+      const sound = playerContext?.playerState.sound as Sound
+      const actualIndex = playerContext?.playerState.musicList.findIndex(
+        music => music.id === playerContext.playerState.musicActualy?.id
+      ) as number
+      if (actualIndex !== 0) {
+        const nextMusic = playerContext?.playerState.musicList[actualIndex - 1]
+        if (nextMusic) {
+          const musicUrl = await youtubeService.getMusicPlayUrl(
+            nextMusic?.youtubeId
+          )
+          await sound.unloadAsync()
+          await sound.loadAsync(
+            {
+              uri: musicUrl
+            },
+            { shouldPlay: true }
+          )
+          playerContext?.setPlayerState({
+            ...playerContext.playerState,
+            sound,
+            musicActualy: nextMusic
+          })
+        }
+      }
+    },
+    async startPlaylist(playlist: IMusic[], position: number) {
+      const sound = playerContext?.playerState.sound as Sound
+      const musicUrl = await youtubeService.getMusicPlayUrl(
+        playlist[position].youtubeId
+      )
+      await sound.unloadAsync()
+      await sound.loadAsync(
+        {
+          uri: musicUrl
+        },
+        { shouldPlay: true }
+      )
+      playerContext?.setPlayerState({
+        sound: sound,
+        musicList: playlist,
+        musicActualy: playlist[position]
+      })
+    },
+    ...playerContext?.playerState
+  }
 }

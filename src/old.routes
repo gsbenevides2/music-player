@@ -1,0 +1,33 @@
+
+      {/**
+	 <Tabs.Screen
+		name='Artists'
+		options={{
+		 tabBarIcon:({color})=>{
+			return <MaterialCommunityIcons name="artist" size={24} color={color} />
+		 }
+		}}
+		component={ArtistsScreen}
+	 />
+	 <Tabs.Screen
+		name='Playlists'
+		options={{
+		 tabBarIcon:({color})=>{
+			return <MaterialCommunityIcons name="playlist-music" size={24} color={color} />
+		 }
+		}}
+		component={PlaylistsScreen}
+	 />
+		 **/}
+
+		 
+        {/**
+		<Stack.Screen
+		 name='Artist'
+		 component={ArtistScreen}
+		/>
+		<Stack.Screen
+		 name='Playlist'
+		 component={PlaylistScreen}
+		/>
+		 **/}

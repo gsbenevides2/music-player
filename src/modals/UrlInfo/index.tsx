@@ -2,7 +2,6 @@ import React from 'react'
 import { 
  Portal, 
  Dialog, 
- Paragraph, 
  Button,
  TextInput
 } from 'react-native-paper'
@@ -10,9 +9,10 @@ import {
 interface Props {
  visible:boolean
  close:()=>void
+ next:(url:string)=>void
 }
 
-export const useUrlInfo = ()=>{
+export const useUrlInfo = (callback:(url:string)=>void)=>{
  const [visible, setVisible] = React.useState(false)
  const close = React.useCallback(()=>{
 	setVisible(false)
@@ -20,11 +20,18 @@ export const useUrlInfo = ()=>{
  const open = React.useCallback(()=>{
 	setVisible(true)
  },[])
- return {visible, open, close}
+ const next = React.useCallback((url:string)=>{
+	 callback(url)
+ },[])
+ return {visible, open, close, next}
 }
 
 const UrlInfo:React.FC<Props> = (props)=>{
-
+ const [url, setUrl] = React.useState('')
+ const next = React.useCallback(()=>{
+   props.next(url)
+   props.close()
+ },[url])
  const hideDialog = React.useCallback(()=>{
 	props.close()
  },[])
@@ -37,12 +44,15 @@ const UrlInfo:React.FC<Props> = (props)=>{
 		<Dialog.Title>Insira a URL do Youtube</Dialog.Title>
 		<Dialog.Content>
 		 <TextInput
+			value={url}
+			onEndEditing={next}
+			onChangeText={text=>setUrl(text)}
 			label='URL do Vídeo'
 		 />
 		</Dialog.Content>
 		<Dialog.Actions>
 		 <Button onPress={hideDialog}>Sair</Button>
-		 <Button onPress={hideDialog}>Continuar</Button>
+		 <Button onPress={next}>Continuar</Button>
 		</Dialog.Actions>
 	 </Dialog>
 	</Portal>

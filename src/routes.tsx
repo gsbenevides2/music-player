@@ -1,107 +1,93 @@
-import React from 'react';
-import { NavigationContainer, DarkTheme } from '@react-navigation/native'
-import { createMaterialBottomTabNavigator } from '@react-navigation/material-bottom-tabs'
-import { createStackNavigator } from '@react-navigation/stack'
+// eslint-disable-next-line no-use-before-define
+import React from 'react'
 
 import { MaterialCommunityIcons } from '@expo/vector-icons'
+import { createMaterialBottomTabNavigator } from '@react-navigation/material-bottom-tabs'
+import { NavigationContainer, DarkTheme } from '@react-navigation/native'
+import { createStackNavigator } from '@react-navigation/stack'
 
-import SplashScreen from './pages/Splash'
-
-import PlayerScreen from './pages/Player'
-//import ArtistsScreen from './pages/Artists'
-//import PlaylistsScreen from './pages/Playlists'
-
-//import ArtistScreen from './pages/Artist'
-//import PlaylistScreen from './pages/Playlist'
 import AllMusicsScreen from './pages/AllMusics'
+import MusicScreen from './pages/Music'
+import PlayerScreen from './pages/Player'
 import ReproductionListScreen from './pages/ReproductionList'
-
+import SelectMusicScreen from './pages/SelectMusic'
+import SplashScreen from './pages/Splash'
 import UserScreen from './pages/User'
 
-function TabsRoutes(){
- const Tabs = createMaterialBottomTabNavigator()
- return (
-	<Tabs.Navigator initialRouteName='Player' shifting>
-	 <Tabs.Screen
-		name='Player'
-		options={{
-		 tabBarIcon:({color})=>{
-			return <MaterialCommunityIcons name="play" size={24} color={color} />
-		 }
-		}}
-		component={PlayerScreen}
-	 />
-	 {/**
-	 <Tabs.Screen
-		name='Artists'
-		options={{
-		 tabBarIcon:({color})=>{
-			return <MaterialCommunityIcons name="artist" size={24} color={color} />
-		 }
-		}}
-		component={ArtistsScreen}
-	 />
-	 <Tabs.Screen
-		name='Playlists'
-		options={{
-		 tabBarIcon:({color})=>{
-			return <MaterialCommunityIcons name="playlist-music" size={24} color={color} />
-		 }
-		}}
-		component={PlaylistsScreen}
-	 />
-		 **/}
-	 <Tabs.Screen
-		name='User'
-		options={{
-		 tabBarIcon:({color})=>{
-			return <MaterialCommunityIcons name="account" size={24} color={color} />
-		 }
-		}}
-		component={UserScreen}
-	 />
-	</Tabs.Navigator>
- )
+// import ArtistsScreen from './pages/Artists'
+// import PlaylistsScreen from './pages/Playlists'
+// import ArtistScreen from './pages/Artist'
+// import PlaylistScreen from './pages/Playlist'
+
+function TabsRoutes() {
+  const Tabs = createMaterialBottomTabNavigator()
+  return (
+    <Tabs.Navigator initialRouteName="Player" shifting>
+      <Tabs.Screen
+        name="Player"
+        options={{
+          // eslint-disable-next-line react/display-name
+          tabBarIcon: ({ color }) => (
+            <MaterialCommunityIcons name="play" size={24} color={color} />
+          )
+        }}
+        component={PlayerScreen}
+      />
+      <Tabs.Screen
+        name="User"
+        options={{
+          // eslint-disable-next-line react/display-name
+          tabBarIcon: ({ color }) => (
+            <MaterialCommunityIcons name="account" size={24} color={color} />
+          )
+        }}
+        component={UserScreen}
+      />
+    </Tabs.Navigator>
+  )
 }
 
-export default function Routes(){
- const Stack = createStackNavigator()
- return (
-	<NavigationContainer theme={DarkTheme}>
-	 <Stack.Navigator>
-		<Stack.Screen
-		 name='splash'
-		 options={{
-			headerShown:false
-		 }}
-		 component={SplashScreen}
-		/>
-		<Stack.Screen
-		 name='tabs'
-		 options={{
-			headerShown:false
-		 }}
-		 component={TabsRoutes}
-		/>
-	 {/**
-		<Stack.Screen
-		 name='Artist'
-		 component={ArtistScreen}
-		/>
-		<Stack.Screen
-		 name='Playlist'
-		 component={PlaylistScreen}
-		/>
-		 **/}
-		<Stack.Screen
-		 name='AllMusics'
-		 component={AllMusicsScreen}
-		/>
-		<Stack.Screen
-		 name='ReproductionList'
-		 component={ReproductionListScreen}
-		/>
-	 </Stack.Navigator>
-	</NavigationContainer>
- )
+const Routes: React.FC = () => {
+  const Stack = createStackNavigator()
+  return (
+    <NavigationContainer theme={DarkTheme}>
+      <Stack.Navigator>
+        <Stack.Screen
+          name="splash"
+          options={{
+            headerShown: false
+          }}
+          component={SplashScreen}
+        />
+        <Stack.Screen
+          name="tabs"
+          options={{
+            headerShown: false
+          }}
+          component={TabsRoutes}
+        />
+        <Stack.Screen
+          name="SelectMusic"
+          options={{
+            title: 'Selecione uma música:'
+          }}
+          component={SelectMusicScreen}
+        />
+        <Stack.Screen
+          name="AllMusics"
+          options={{
+            title: 'Todas as Músicas'
+          }}
+          component={AllMusicsScreen}
+        />
+        <Stack.Screen
+          name="ReproductionList"
+          component={ReproductionListScreen}
+        />
+        <Stack.Screen name="Music" component={MusicScreen} />
+      </Stack.Navigator>
+    </NavigationContainer>
+  )
 }
+
+export default Routes

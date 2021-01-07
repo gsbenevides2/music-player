@@ -1,18 +1,29 @@
-import React from 'react';
-import Routes from './src/routes';
-import {StatusBar} from 'expo-status-bar'
-
+// eslint-disable-next-line no-use-before-define
+import React from 'react'
+import FlashMessage from 'react-native-flash-message'
 import { Provider, DarkTheme } from 'react-native-paper'
-import {DatabaseProvider} from './src/services/database';
 
-export default function App() {
- return (
-	<Provider theme={DarkTheme}>
-	 <DatabaseProvider>
-		<Routes/>
-		<StatusBar style='light'/>
-	 </DatabaseProvider>
-	</Provider>
- )
+import { StatusBar } from 'expo-status-bar'
+
+import './src/YellowBox'
+import { PlayerProvider } from './src/contexts/player'
+import Routes from './src/routes'
+import { DatabaseProvider } from './src/services/database'
+
+DarkTheme.colors.accent = DarkTheme.colors.primary
+
+const App: React.FC = () => {
+  return (
+    <Provider theme={DarkTheme}>
+      <PlayerProvider>
+        <DatabaseProvider>
+          <Routes />
+          <StatusBar style="light" />
+        </DatabaseProvider>
+        <FlashMessage position="top" />
+      </PlayerProvider>
+    </Provider>
+  )
 }
 
+export default App

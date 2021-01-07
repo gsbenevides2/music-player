@@ -1,89 +1,117 @@
+// eslint-disable-next-line no-use-before-define
 import React from 'react'
-import { View, Image, useWindowDimensions } from 'react-native'
-import {Text, IconButton} from 'react-native-paper'
-import Slider from '@react-native-community/slider'
+import { View } from 'react-native'
 
-import PlayerButton from '../../components/PlayerButton'
-
+import { usePlayerContext } from '../../contexts/player/use'
+import { useHorizontal } from '../../useHorizontal'
+import { AlbumImageMemorized } from './components/AlbumImage'
+import { MusicDataMemorized } from './components/MusicData'
+import { MusicProgressBarMemorized } from './components/MusicProgressBar'
+import { PlayerButtonsMemorized } from './components/PlayerButtons'
 import styles from './styles'
-import {useNavigation} from '@react-navigation/native'
 
-import MusicInfo, { useMusicInfo } from '../../modals/MusicInfo'
+// eslint-disable-next-line @typescript-eslint/explicit-module-boundary-types
+export default function PlayerScreen() {
+  const player = usePlayerContext()
+  const horizontal = useHorizontal()
+  const [isPlaying, setIsPlaying] = React.useState(false)
+  const [timeData, setTimeData] = React.useState({
+    to: 0,
+    from: 0
+  })
 
-export default function PlayerScreen(){
- const musicInfo = useMusicInfo()
- const width = useWindowDimensions().width * 0.9
- const navigation = useNavigation()
+  const handlePlayOrPauseButton = React.useCallback(async () => {
+    const soundStatus = await player.sound?.getStatusAsync()
+    if (soundStatus?.isLoaded) {
+      if (soundStatus.isPlaying) {
+        await player.pauseMusic()
+      } else {
+        await player.playMusic()
+      }
+    }
+  }, [player.sound])
 
- const handleToReproductionListScreen = React.useCallback(()=>{
-	navigation.navigate('ReproductionList')
- },[])
+  const handleSliderPosition = React.useCallback(
+    async (position: number) => {
+      await player.sound?.setPositionAsync(position)
+    },
+    [player.sound]
+  )
 
- return (
-	<View style={styles.container}>
-	 <Image
-		resizeMode="contain"
-		style={{width, height:width, marginBottom:20}}
-		source={{uri:'https://upload.wikimedia.org/wikipedia/pt/9/9a/Avicii_-_Tim.png'}}
-	 />
-	 <Text style={styles.musicName}>Lay me down</Text>
-	 <Text style={styles.artistName}>Avicii</Text>
-	 <View style={styles.playerControlArea}>
-		<View style={styles.playerTimeArea}>
-		 <Text>00:11</Text>
-		 <Text>03:11</Text>
-		</View>
-		<Slider
-		 style={{width:"100%", height: 40}}
-		 minimumValue={0}
-		 maximumValue={1}
-		 thumbTintColor='#123366'
-		 minimumTrackTintColor="#123366"
-		 maximumTrackTintColor="#ffffff"
-		/>
-		<View style={styles.optionsArea}>
-		 <IconButton
-			onPress={()=>{}}
-			icon='shuffle'
-			color='white'
-			size={20}
-		 />
-		 <IconButton
-			onPress={handleToReproductionListScreen}
-			icon='format-list-bulleted-square'
-			color='white'
-			size={20}
-		 />
-		 <IconButton
-			onPress={musicInfo.open}
-			icon='information-outline'
-			color='white'
-			size={20}
-		 />
-		</View>
-		<View style={styles.playerButtonsArea}>
-		 <PlayerButton
-			onPress={()=>{}}
-			icon='skip-previous'
-			color='#123366'
-		 />
-		 <PlayerButton
-			onPress={()=>{}}
-			icon='play'
-			color='#123366'
-			isLarge
-		 />
-		 <PlayerButton
-			onPress={()=>{}}
-			icon='skip-next'
-			color='#123366'
-		 />
-		</View>
-	 </View>
-	 <MusicInfo 
-		visible={musicInfo.visible} 
-		close={musicInfo.close}/>
-	</View>
- )
+  const handleToNextMusic = React.useCallback(() => {
+    player.playNext()
+  }, [player.sound, player.musicActualy])
+
+  const handleToPreviousMusic = React.useCallback(() => {
+    player.playPrevious()
+  }, [player.sound, player.musicActualy])
+
+  React.useEffect(() => {
+    player.sound?.setOnPlaybackStatusUpdate(playbackStatus => {
+      if (playbackStatus.isLoaded) {
+        setTimeData({
+          to: playbackStatus.durationMillis || 0,
+          from: playbackStatus.positionMillis
+        })
+        if (playbackStatus.didJustFinish) {
+          player.playNext()
+        }
+        setIsPlaying(playbackStatus.isPlaying)
+      } else {
+        setIsPlaying(false)
+      }
+    })
+  }, [player.sound, player.musicActualy])
+  return (
+    <View
+      style={horizontal ? styles.containerHorizontal : styles.containerVertical}
+    >
+      <AlbumImageMemorized
+        horizontal={horizontal}
+        url={player.musicActualy?.coverUrl}
+      />
+
+      <View
+        style={
+          horizontal
+            ? styles.controlsAreaHorizontal
+            : styles.controlsAreaVertical
+        }
+      >
+        <MusicDataMemorized
+          musicName={player.musicActualy?.name}
+          artistName={player.musicActualy?.artist.name}
+        />
+        <View style={styles.playerControlArea}>
+          <MusicProgressBarMemorized
+            {...timeData}
+            handleSliderPosition={handleSliderPosition}
+          />
+          <PlayerButtonsMemorized
+            isPlaying={isPlaying}
+            handlePrevious={handleToPreviousMusic}
+            handleNext={handleToNextMusic}
+            handlePlayOrPause={handlePlayOrPauseButton}
+          />
+        </View>
+      </View>
+    </View>
+  )
 }
 
+/*
+ * Old Code for future implementation
+import { useNavigation } from '@react-navigation/native'
+import MusicInfo, { useMusicInfo } from '../../modals/MusicInfo'
+  const musicInfo = useMusicInfo()
+import { PlayerOptionsMemorized } from './components/PlayerOptions'
+  const navigation = useNavigation()
+  const handleToReproductionListScreen = React.useCallback(() => {
+    navigation.navigate('ReproductionList')
+  }, [])
+          <PlayerOptionsMemorized
+            openMusicInfo={musicInfo.open}
+            openReproductionList={handleToReproductionListScreen}
+          />
+					<MusicInfo visible={musicInfo.visible} close={musicInfo.close} />
+ */

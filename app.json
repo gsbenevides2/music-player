@@ -1,9 +1,8 @@
 {
   "expo": {
-    "name": "Player de Música",
-    "slug": "music-player",
+    "name": "Musicius",
+    "slug": "musicius",
     "version": "1.0.0",
-    "orientation": "portrait",
     "icon": "./assets/icon.png",
     "splash": {
       "image": "./assets/splash.png",
@@ -19,10 +18,12 @@
       "**/*"
     ],
     "android": {
-      "adaptiveIcon": {
-        "foregroundImage": "./assets/icon.png",
-        "backgroundColor": "#000000"
-      }
+		 "package": "com.gsbenevides.musicius",
+      "adaptiveIcon": { 
+        "foregroundImage": "./assets/foreground.png",
+        "backgroundColor": "#5E35B1"
+      },
+			"versionCode": 1
     },
 		"androidStatusBar":{
 			"barStyle":"light-content"
