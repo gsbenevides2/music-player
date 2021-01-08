@@ -10,9 +10,9 @@
 <img src=".github/markdownImages/screenshots.jpg" width="90%"/>
 </p>
 
-## Leia a wiki( em breve estará lá)
-- Instalação
-- Por de baixo dos panos
+## Leia a wiki
+- [Instalação](https://github.com/gsbenevides2/musicius/wiki/Instala%C3%A7%C3%A3o)
+- Por de baixo dos panos(em breve estará lá)
 
 ## Licença
 Esse projeto está usando a licença MIT
