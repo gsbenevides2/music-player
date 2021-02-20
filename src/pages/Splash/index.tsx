@@ -8,7 +8,7 @@ import { useAssets } from 'expo-asset'
 
 import { useDatabase } from '../../services/database'
 
-export default function SplashScreen(): React.ReactNode {
+export default function SplashScreen(): React.ReactElement {
   const navigation = useNavigation()
   const database = useDatabase()
   // eslint-disable-next-line @typescript-eslint/no-var-requires
