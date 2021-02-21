@@ -1,13 +1,13 @@
 // eslint-disable-next-line no-use-before-define
 import React from 'react'
 import { View, Image } from 'react-native'
+import { Title, Subheading } from 'react-native-paper'
 
 import MusicList from '../../components/MusicList'
+import { usePlayerContext } from '../../contexts/player/use'
 import { useDatabase } from '../../services/database'
 import { useMusicTable } from '../../services/database/tables/music'
 import { IMusic } from '../../types'
-import { usePlayerContext } from '../../contexts/player/use'
-import { Title, Subheading } from 'react-native-paper'
 
 const NoMusic: React.FC = () => (
   <View style={{ alignItems: 'center' }}>

@@ -7,7 +7,7 @@ import styles from './styles'
 
 export interface PlayerOptionsProps {
   openReproductionList: () => void
-  openMusicInfo: () => void
+  openMusicInfo?: () => void
   shuffle?: () => void
 }
 export const PlayerOptions: React.FC<PlayerOptionsProps> = props => {
@@ -20,14 +20,16 @@ export const PlayerOptions: React.FC<PlayerOptionsProps> = props => {
         color="white"
         size={20}
       />
+    </View>
+  )
+}
+
+export const PlayerOptionsMemorized = React.memo(PlayerOptions)
+/*
       <IconButton
         onPress={props.openMusicInfo}
         icon="information-outline"
         color="white"
         size={20}
       />
-    </View>
-  )
-}
-
-export const PlayerOptionsMemorized = React.memo(PlayerOptions)
+ */

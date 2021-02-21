@@ -1,10 +1,11 @@
 import { useContext } from 'react'
 
+import { Sound } from 'expo-av/build/Audio'
+
 import { PlayerContext } from '.'
 import { YoutubeService } from '../../services/youtube'
 import { IMusic } from '../../types'
 import { LoadedUsecontext } from './types'
-import { Sound } from 'expo-av/build/Audio'
 
 export function usePlayerContext(): LoadedUsecontext {
   const playerContext = useContext(PlayerContext)
@@ -87,6 +88,12 @@ export function usePlayerContext(): LoadedUsecontext {
         sound: sound,
         musicList: playlist,
         musicActualy: playlist[position]
+      })
+    },
+    setMusicList(musics: IMusic[]) {
+      playerContext?.setPlayerState({
+        ...playerContext.playerState,
+        musicList: musics
       })
     },
     ...playerContext?.playerState

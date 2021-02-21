@@ -23,6 +23,7 @@ export interface LoadedUsecontext {
   playNext: () => Promise<void>
   playPrevious: () => Promise<void>
   startPlaylist: (playlist: IMusic[], position: number) => Promise<void>
+  setMusicList: (musics: IMusic[]) => void
   sound?: Audio.Sound
   musicActualy?: IMusic
   musicList?: IMusic[]

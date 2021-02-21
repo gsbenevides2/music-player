@@ -9,9 +9,12 @@ import { MusicDataMemorized } from './components/MusicData'
 import { MusicProgressBarMemorized } from './components/MusicProgressBar'
 import { PlayerButtonsMemorized } from './components/PlayerButtons'
 import styles from './styles'
+import { PlayerOptionsMemorized } from './components/PlayerOptions'
+import { useNavigation } from '@react-navigation/native'
 
 // eslint-disable-next-line @typescript-eslint/explicit-module-boundary-types
 export default function PlayerScreen() {
+  const navigation = useNavigation()
   const player = usePlayerContext()
   const horizontal = useHorizontal()
   const [isPlaying, setIsPlaying] = React.useState(false)
@@ -29,22 +32,25 @@ export default function PlayerScreen() {
         await player.playMusic()
       }
     }
-  }, [player.sound])
+  }, [player])
 
   const handleSliderPosition = React.useCallback(
     async (position: number) => {
       await player.sound?.setPositionAsync(position)
     },
-    [player.sound]
+    [player]
   )
 
   const handleToNextMusic = React.useCallback(() => {
     player.playNext()
-  }, [player.sound, player.musicActualy])
+  }, [player])
 
   const handleToPreviousMusic = React.useCallback(() => {
     player.playPrevious()
-  }, [player.sound, player.musicActualy])
+  }, [player])
+  const handleToReproductionListScreen = React.useCallback(() => {
+    navigation.navigate('ReproductionList')
+  }, [])
 
   React.useEffect(() => {
     player.sound?.setOnPlaybackStatusUpdate(playbackStatus => {
@@ -83,6 +89,9 @@ export default function PlayerScreen() {
           artistName={player.musicActualy?.artist.name}
         />
         <View style={styles.playerControlArea}>
+          <PlayerOptionsMemorized
+            openReproductionList={handleToReproductionListScreen}
+          />
           <MusicProgressBarMemorized
             {...timeData}
             handleSliderPosition={handleSliderPosition}
@@ -101,17 +110,7 @@ export default function PlayerScreen() {
 
 /*
  * Old Code for future implementation
-import { useNavigation } from '@react-navigation/native'
 import MusicInfo, { useMusicInfo } from '../../modals/MusicInfo'
   const musicInfo = useMusicInfo()
-import { PlayerOptionsMemorized } from './components/PlayerOptions'
-  const navigation = useNavigation()
-  const handleToReproductionListScreen = React.useCallback(() => {
-    navigation.navigate('ReproductionList')
-  }, [])
-          <PlayerOptionsMemorized
-            openMusicInfo={musicInfo.open}
-            openReproductionList={handleToReproductionListScreen}
-          />
 					<MusicInfo visible={musicInfo.visible} close={musicInfo.close} />
  */
