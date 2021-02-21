@@ -1,11 +1,22 @@
 // eslint-disable-next-line no-use-before-define
 import React from 'react'
-import { View } from 'react-native'
-
+import { View, Image } from 'react-native'
+import { Title, Subheading } from 'react-native-paper'
 import MusicListDrag from '../../components/MusicListDrag'
 import { usePlayerContext } from '../../contexts/player/use'
 import { IMusic } from '../../types'
 
+const NotPlaying: React.FC = () => (
+  <View style={{ alignItems: 'center' }}>
+    <Image
+      resizeMode={'contain'}
+      style={{ width: '80%', height: '80%' }}
+      source={require('../../assets/no_music.png')}
+    />
+    <Title>Não está tocando nada</Title>
+    <Subheading>Tente colocar uma múscia para tocar</Subheading>
+  </View>
+)
 export default function HomeScreen(): React.ReactElement {
   const player = usePlayerContext()
   const musicListChange = React.useCallback(
@@ -26,7 +37,7 @@ export default function HomeScreen(): React.ReactElement {
     },
     [player.musicList]
   )
-  if (player.musicList) {
+  if (player.musicList && player.musicList.length) {
     return (
       <View style={{ flex: 1 }}>
         <MusicListDrag
@@ -37,6 +48,6 @@ export default function HomeScreen(): React.ReactElement {
       </View>
     )
   } else {
-    return <View style={{ flex: 1 }}></View>
+    return <NotPlaying />
   }
 }

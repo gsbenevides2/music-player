@@ -83,6 +83,9 @@ const Routes: React.FC = () => {
         />
         <Stack.Screen
           name="ReproductionList"
+          options={{
+            title: 'Reproduzindo Agora'
+          }}
           component={ReproductionListScreen}
         />
         <Stack.Screen name="Music" component={MusicScreen} />
