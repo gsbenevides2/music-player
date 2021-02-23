@@ -2,6 +2,7 @@
 import React from 'react'
 import { View, Image } from 'react-native'
 import { Title, Subheading } from 'react-native-paper'
+
 import MusicListDrag from '../../components/MusicListDrag'
 import { usePlayerContext } from '../../contexts/player/use'
 import { IMusic } from '../../types'
@@ -21,10 +22,9 @@ export default function HomeScreen(): React.ReactElement {
   const player = usePlayerContext()
   const musicListChange = React.useCallback(
     (musics: IMusic[]) => {
-      console.log(musics)
       player.setMusicList(musics)
     },
-    [player]
+    [player.musicList]
   )
   const musicPressCallback = React.useCallback(
     async (musicId: string) => {

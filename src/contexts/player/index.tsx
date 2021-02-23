@@ -14,7 +14,8 @@ export const PlayerProvider: React.FC = ({ children }) => {
   const sound = new Audio.Sound()
   const [playerState, setPlayerState] = React.useState<PlayerState>({
     musicList: [],
-    sound
+    sound,
+    isShuffle: false
   })
   return (
     <PlayerContext.Provider value={{ playerState, setPlayerState }}>

@@ -41,10 +41,8 @@ const NoMusic: React.FC = () => (
       style={{ width: '80%', height: '80%' }}
       source={require('../../assets/not_found.png')}
     />
-    <Title>Sem músicas</Title>
-    <Subheading>
-      Volte a pagina anterior e clique em "Adicionar Música"
-    </Subheading>
+    <Title>Ops não encontrei nada</Title>
+    <Subheading>Verefique o nome da musica ou tente uma outra url</Subheading>
   </View>
 )
 const SelectMusicScreen: React.FC = () => {

@@ -8,12 +8,19 @@ import styles from './styles'
 export interface PlayerOptionsProps {
   openReproductionList: () => void
   openMusicInfo?: () => void
-  shuffle?: () => void
+  isShuffle: boolean
+  onShuffle: () => void
 }
 export const PlayerOptions: React.FC<PlayerOptionsProps> = props => {
   return (
     <View style={styles.optionsArea}>
-      <IconButton onPress={() => {}} icon="shuffle" color="white" size={20} />
+      <IconButton
+        style={{ backgroundColor: props.isShuffle ? 'white' : 'transparent' }}
+        onPress={props.onShuffle}
+        icon="shuffle"
+        color={props.isShuffle ? 'black' : 'white'}
+        size={20}
+      />
       <IconButton
         onPress={props.openReproductionList}
         icon="format-list-bulleted-square"

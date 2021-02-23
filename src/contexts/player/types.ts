@@ -8,6 +8,7 @@ export interface PlayerState {
   sound: Audio.Sound
   musicActualy?: IMusic
   musicList: IMusic[]
+  isShuffle: boolean
 }
 
 export interface ContextInterface {
@@ -24,7 +25,9 @@ export interface LoadedUsecontext {
   playPrevious: () => Promise<void>
   startPlaylist: (playlist: IMusic[], position: number) => Promise<void>
   setMusicList: (musics: IMusic[]) => void
+  setShuffle: () => void
   sound?: Audio.Sound
   musicActualy?: IMusic
   musicList?: IMusic[]
+  isShuffle?: boolean
 }

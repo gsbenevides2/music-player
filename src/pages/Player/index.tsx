@@ -2,21 +2,28 @@
 import React from 'react'
 import { View } from 'react-native'
 
+import { useNavigation } from '@react-navigation/native'
+
 import { usePlayerContext } from '../../contexts/player/use'
 import { useHorizontal } from '../../useHorizontal'
 import { AlbumImageMemorized } from './components/AlbumImage'
 import { MusicDataMemorized } from './components/MusicData'
 import { MusicProgressBarMemorized } from './components/MusicProgressBar'
 import { PlayerButtonsMemorized } from './components/PlayerButtons'
-import styles from './styles'
 import { PlayerOptionsMemorized } from './components/PlayerOptions'
-import { useNavigation } from '@react-navigation/native'
+import styles from './styles'
 
 // eslint-disable-next-line @typescript-eslint/explicit-module-boundary-types
 export default function PlayerScreen() {
   const navigation = useNavigation()
   const player = usePlayerContext()
   const horizontal = useHorizontal()
+  const playerListennersData = [
+    player.sound,
+    player.musicActualy,
+    player.musicList,
+    player.isShuffle
+  ]
   const [isPlaying, setIsPlaying] = React.useState(false)
   const [timeData, setTimeData] = React.useState({
     to: 0,
@@ -32,22 +39,19 @@ export default function PlayerScreen() {
         await player.playMusic()
       }
     }
-  }, [player])
+  }, playerListennersData)
 
-  const handleSliderPosition = React.useCallback(
-    async (position: number) => {
-      await player.sound?.setPositionAsync(position)
-    },
-    [player]
-  )
+  const handleSliderPosition = React.useCallback(async (position: number) => {
+    await player.sound?.setPositionAsync(position)
+  }, playerListennersData)
 
   const handleToNextMusic = React.useCallback(() => {
     player.playNext()
-  }, [player])
+  }, playerListennersData)
 
   const handleToPreviousMusic = React.useCallback(() => {
     player.playPrevious()
-  }, [player])
+  }, playerListennersData)
   const handleToReproductionListScreen = React.useCallback(() => {
     navigation.navigate('ReproductionList')
   }, [])
@@ -67,7 +71,7 @@ export default function PlayerScreen() {
         setIsPlaying(false)
       }
     })
-  }, [player.sound, player.musicActualy])
+  }, playerListennersData)
   return (
     <View
       style={horizontal ? styles.containerHorizontal : styles.containerVertical}
@@ -90,6 +94,8 @@ export default function PlayerScreen() {
         />
         <View style={styles.playerControlArea}>
           <PlayerOptionsMemorized
+            isShuffle={player.isShuffle || false}
+            onShuffle={player.setShuffle}
             openReproductionList={handleToReproductionListScreen}
           />
           <MusicProgressBarMemorized
