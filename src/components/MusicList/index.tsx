@@ -1,5 +1,5 @@
 // eslint-disable-next-line no-use-before-define
-import React, { useCallback } from 'react'
+import React from 'react'
 import { FlatList, Image } from 'react-native'
 import { List, Button } from 'react-native-paper'
 
@@ -35,10 +35,10 @@ interface ItemProps {
 }
 const Item: React.FC<ItemProps> = props => {
   const { music } = props
-  const onPressCallback = useCallback(() => {
+  const onPressCallback = React.useCallback(() => {
     props.onPress(music.id)
   }, [])
-  const onMoreCallback = useCallback(() => {
+  const onMoreCallback = React.useCallback(() => {
     if (props.onMore) props.onMore(music.id)
   }, [])
   return (

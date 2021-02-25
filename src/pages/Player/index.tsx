@@ -12,34 +12,23 @@ import { MusicProgressBarMemorized } from './components/MusicProgressBar'
 import { PlayerButtonsMemorized } from './components/PlayerButtons'
 import { PlayerOptionsMemorized } from './components/PlayerOptions'
 import styles from './styles'
+import { getPlayerListenners } from '../../contexts/player/listenners'
 
 // eslint-disable-next-line @typescript-eslint/explicit-module-boundary-types
 export default function PlayerScreen() {
   const navigation = useNavigation()
   const player = usePlayerContext()
   const horizontal = useHorizontal()
-  const playerListennersData = [
-    player.sound,
-    player.musicActualy,
-    player.musicList,
-    player.isShuffle
-  ]
+  const playerListennersData = getPlayerListenners(player)
   const [isPlaying, setIsPlaying] = React.useState(false)
-  const [timeData, setTimeData] = React.useState({
-    to: 0,
-    from: 0
-  })
 
   const handlePlayOrPauseButton = React.useCallback(async () => {
-    const soundStatus = await player.sound?.getStatusAsync()
-    if (soundStatus?.isLoaded) {
-      if (soundStatus.isPlaying) {
-        await player.pauseMusic()
-      } else {
-        await player.playMusic()
-      }
+    if (isPlaying) {
+      await player.pauseMusic()
+    } else {
+      await player.playMusic()
     }
-  }, playerListennersData)
+  }, [...playerListennersData, isPlaying])
 
   const handleSliderPosition = React.useCallback(async (position: number) => {
     await player.sound?.setPositionAsync(position)
@@ -59,10 +48,10 @@ export default function PlayerScreen() {
   React.useEffect(() => {
     player.sound?.setOnPlaybackStatusUpdate(playbackStatus => {
       if (playbackStatus.isLoaded) {
-        setTimeData({
-          to: playbackStatus.durationMillis || 0,
-          from: playbackStatus.positionMillis
-        })
+        player.setTimeData(
+          playbackStatus.durationMillis || 0,
+          playbackStatus.positionMillis
+        )
         if (playbackStatus.didJustFinish) {
           player.playNext()
         }
@@ -96,10 +85,13 @@ export default function PlayerScreen() {
           <PlayerOptionsMemorized
             isShuffle={player.isShuffle || false}
             onShuffle={player.setShuffle}
+            onRepeat={player.setRepeat}
+            isRepeat={player.isRepeat || false}
             openReproductionList={handleToReproductionListScreen}
           />
           <MusicProgressBarMemorized
-            {...timeData}
+            to={player.timeDataTo || 0}
+            from={player.timeDataFrom || 0}
             handleSliderPosition={handleSliderPosition}
           />
           <PlayerButtonsMemorized

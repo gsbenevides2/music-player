@@ -10,6 +10,8 @@ export interface PlayerOptionsProps {
   openMusicInfo?: () => void
   isShuffle: boolean
   onShuffle: () => void
+  isRepeat: boolean
+  onRepeat: () => void
 }
 export const PlayerOptions: React.FC<PlayerOptionsProps> = props => {
   return (
@@ -17,8 +19,15 @@ export const PlayerOptions: React.FC<PlayerOptionsProps> = props => {
       <IconButton
         style={{ backgroundColor: props.isShuffle ? 'white' : 'transparent' }}
         onPress={props.onShuffle}
-        icon="shuffle"
+        icon={props.isShuffle ? 'shuffle' : 'shuffle-disabled'}
         color={props.isShuffle ? 'black' : 'white'}
+        size={20}
+      />
+      <IconButton
+        style={{ backgroundColor: props.isRepeat ? 'white' : 'transparent' }}
+        onPress={props.onRepeat}
+        icon={props.isRepeat ? 'repeat' : 'repeat-off'}
+        color={props.isRepeat ? 'black' : 'white'}
         size={20}
       />
       <IconButton

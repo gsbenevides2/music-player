@@ -1,3 +1,4 @@
+/* eslint-disable multiline-ternary */
 // eslint-disable-next-line no-use-before-define
 import React from 'react'
 import { Portal, Dialog, Paragraph, Button } from 'react-native-paper'
@@ -8,6 +9,7 @@ interface MusicData {
   artist: string
 }
 interface Methods {
+  removeFromMusicList?: (musicId: string) => void
   deleteMusic: (musicId: string) => void
 }
 interface Props {
@@ -21,10 +23,9 @@ interface useMusicInfoCallback {
   open: (musicData: MusicData) => void
   close: () => void
   data: MusicData
-  methods: Methods
 }
 
-export const useMusicInfo = (methods: Methods): useMusicInfoCallback => {
+export const useMusicInfo = (): useMusicInfoCallback => {
   const [visible, setVisible] = React.useState(false)
   const [musicData, setMusicData] = React.useState<MusicData>({
     id: '',
@@ -42,8 +43,7 @@ export const useMusicInfo = (methods: Methods): useMusicInfoCallback => {
     visible,
     open,
     close,
-    data: musicData,
-    methods
+    data: musicData
   }
 }
 
@@ -62,6 +62,13 @@ const MusicInfo: React.FC<Props> = props => {
           {/*<Button onPress={hideDialog}>Ver foto de capa</Button>
           <Button onPress={hideDialog}>Ver artista</Button>
 					<Button onPress={hideDialog}>Baixar</Button>*/}
+          {props.methods.removeFromMusicList ? (
+            <Button
+              onPress={() => props.methods.removeFromMusicList?.(props.data.id)}
+            >
+              Remover da Reprodução Atual
+            </Button>
+          ) : undefined}
           <Button onPress={() => props.methods.deleteMusic(props.data.id)}>
             Apagar
           </Button>
