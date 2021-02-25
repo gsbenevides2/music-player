@@ -1,9 +1,8 @@
 import { ResultSet } from 'expo-sqlite'
 
+import { IMusic } from '../../../types'
 import { DatabaseService } from '../databaseService'
 import { Table } from '../tableSchema'
-import { DatabaseProvider } from '..'
-import { IMusic } from '../../../types'
 
 export class MusicsTable extends Table {
   version = 1
@@ -42,6 +41,7 @@ interface UseMusicTableReturn {
     artistId: string
   ) => Promise<void>
   getByYoutubeId: (youtubeId: string) => Promise<IMusic | null>
+  delete: (id: string) => Promise<void>
   list: () => Promise<IMusic[]>
 }
 export function useMusicTable(database: DatabaseService): UseMusicTableReturn {
@@ -81,6 +81,12 @@ export function useMusicTable(database: DatabaseService): UseMusicTableReturn {
         const music = rows[0] as IDatabaseMusicLeftJoinArtists
         return music ? sanitizeDatabaseMusicResult(music) : null
       } else throw new Error('Erro Desconhecido')
+    },
+    async delete(id: string): Promise<void> {
+      await database.execSQLQuery({
+        sql: ['DELETE FROM musics', 'WHERE musics.id = ?'],
+        args: [id]
+      })
     },
     async getByYoutubeId(youtubeId: string): Promise<IMusic | null> {
       const sqlResult = await database.execSQLQuery({

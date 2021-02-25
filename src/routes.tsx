@@ -34,12 +34,13 @@ function TabsRoutes() {
         component={PlayerScreen}
       />
       <Tabs.Screen
-        name="User"
+        name="Options"
         options={{
           // eslint-disable-next-line react/display-name
           tabBarIcon: ({ color }) => (
             <MaterialCommunityIcons name="account" size={24} color={color} />
-          )
+          ),
+          title: 'Opções'
         }}
         component={UserScreen}
       />
@@ -82,6 +83,9 @@ const Routes: React.FC = () => {
         />
         <Stack.Screen
           name="ReproductionList"
+          options={{
+            title: 'Reproduzindo Agora'
+          }}
           component={ReproductionListScreen}
         />
         <Stack.Screen name="Music" component={MusicScreen} />

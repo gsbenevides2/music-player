@@ -1,7 +1,7 @@
 // eslint-disable-next-line no-use-before-define
-import React, { useCallback } from 'react'
+import React from 'react'
 import { FlatList, Image } from 'react-native'
-import { List } from 'react-native-paper'
+import { List, Button } from 'react-native-paper'
 
 interface Music {
   id: string
@@ -31,11 +31,15 @@ const ImageAlbum: React.FC<ImageAlbumProps> = ({ url }) => {
 interface ItemProps {
   music: Music
   onPress: (musicId: string) => void
+  onMore?: (musciId: string) => void
 }
 const Item: React.FC<ItemProps> = props => {
   const { music } = props
-  const onPressCallback = useCallback(() => {
+  const onPressCallback = React.useCallback(() => {
     props.onPress(music.id)
+  }, [])
+  const onMoreCallback = React.useCallback(() => {
+    if (props.onMore) props.onMore(music.id)
   }, [])
   return (
     <List.Item
@@ -43,6 +47,16 @@ const Item: React.FC<ItemProps> = props => {
       onPress={onPressCallback}
       description={music.artist.name}
       left={() => <ImageAlbum url={music.coverUrl} />}
+      right={propsIcon =>
+        props.onMore ? (
+          <Button
+            onPress={onMoreCallback}
+            color={propsIcon.color}
+            style={{ ...propsIcon.style, borderRadius: 50 }}
+            icon="dots-vertical"
+          />
+        ) : undefined
+      }
     />
   )
 }
@@ -51,6 +65,7 @@ interface MusicLIstProps {
   musics: Music[]
   onEndReached?: () => void
   onPress: (musicId: string) => void
+  onMore?: (musicId: string) => void
 }
 
 const MemorizedItem = React.memo(Item)
@@ -59,7 +74,11 @@ const MusicList: React.FC<MusicLIstProps> = props => {
     <FlatList
       data={props.musics}
       renderItem={({ item }) => (
-        <MemorizedItem onPress={props.onPress} music={item} />
+        <MemorizedItem
+          onMore={props.onMore}
+          onPress={props.onPress}
+          music={item}
+        />
       )}
       keyExtractor={item => item.id}
       onEndReached={props.onEndReached}
