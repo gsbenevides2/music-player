@@ -1,10 +1,11 @@
 // eslint-disable-next-line no-use-before-define
 import React from 'react'
+
 import AsyncStorage from '@react-native-async-storage/async-storage'
 import { Audio } from 'expo-av'
 
-import { ContextType, PlayerState } from './types'
 import { YoutubeService } from '../../services/youtube'
+import { ContextType, PlayerState } from './types'
 
 export const PlayerContext = React.createContext<ContextType>(undefined)
 
@@ -44,7 +45,6 @@ export const PlayerProvider: React.FC = ({ children }) => {
     })
   }, [])
   React.useEffect(() => {
-    console.log('OK')
     const serializedPlayerState = { ...playerState, sound: undefined }
     AsyncStorage.setItem('playerContext', JSON.stringify(serializedPlayerState))
   }, [

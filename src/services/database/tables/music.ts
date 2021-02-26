@@ -41,6 +41,7 @@ interface UseMusicTableReturn {
     artistId: string
   ) => Promise<void>
   getByYoutubeId: (youtubeId: string) => Promise<IMusic | null>
+  getByArtistId: (artistId: string) => Promise<IMusic[]>
   delete: (id: string) => Promise<void>
   list: () => Promise<IMusic[]>
 }
@@ -106,6 +107,26 @@ export function useMusicTable(database: DatabaseService): UseMusicTableReturn {
         const { rows } = sqlResult.result as ResultSet
         const music = rows[0] as IDatabaseMusicLeftJoinArtists
         return music ? sanitizeDatabaseMusicResult(music) : null
+      } else throw new Error('Erro Desconhecido')
+    },
+    async getByArtistId(artistId: string): Promise<IMusic[]> {
+      const sqlResult = await database.execSQLQuery({
+        sql: [
+          'SELECT musics.*,',
+          'artists.name AS artistName,',
+          'artists.coverUrl AS  artistCoverUrl',
+          'FROM musics LEFT JOIN artists',
+          'ON musics.artistId = artists.id',
+          'WHERE musics.artistId = ?'
+        ],
+        args: [artistId]
+      })
+      if (sqlResult.error) {
+        throw sqlResult.error
+      } else if (sqlResult.result) {
+        const resultSet = sqlResult.result as ResultSet
+        const rows = resultSet.rows as IDatabaseMusicLeftJoinArtists[]
+        return rows.map(sanitizeDatabaseMusicResult)
       } else throw new Error('Erro Desconhecido')
     },
     async insert(

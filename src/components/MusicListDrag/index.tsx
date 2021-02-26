@@ -19,6 +19,7 @@ interface ImageAlbumProps {
 const ImageAlbum: React.FC<ImageAlbumProps> = ({ url }) => {
   return (
     <Image
+      resizeMethod="resize"
       style={{
         width: 50,
         height: 50,

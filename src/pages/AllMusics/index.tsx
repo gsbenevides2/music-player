@@ -45,7 +45,7 @@ const AllMusicsScreen: React.FC = () => {
     await player.startPlaylist(musics, musicIndex)
   }, playerListenners)
   const onMoreCallback = React.useCallback(async (musicId: string) => {
-    const music = (await musicTable.get(musicId)) as IMusic
+    const music = musics.find(music => music.id === musicId) as IMusic
     musicInfo.open({
       id: music.id,
       name: music.name,
