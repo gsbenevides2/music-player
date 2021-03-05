@@ -9,6 +9,10 @@ import { ContextType, PlayerState } from './types'
 
 export const PlayerContext = React.createContext<ContextType>(undefined)
 
+interface AsyncStoragePlayerState extends PlayerState {
+  sound: undefined
+}
+
 export const PlayerProvider: React.FC = ({ children }) => {
   Audio.setAudioModeAsync({
     staysActiveInBackground: true
@@ -25,7 +29,7 @@ export const PlayerProvider: React.FC = ({ children }) => {
   React.useEffect(() => {
     AsyncStorage.getItem('playerContext').then(async value => {
       if (value) {
-        const newPlayerState = JSON.parse(value) as PlayerState
+        const newPlayerState = JSON.parse(value) as AsyncStoragePlayerState
         if (newPlayerState.musicActualy) {
           const youtubeService = new YoutubeService()
           const musicUrl = await youtubeService.getMusicPlayUrl(
@@ -39,7 +43,10 @@ export const PlayerProvider: React.FC = ({ children }) => {
               positionMillis: newPlayerState.timeDataFrom
             }
           )
-          setPlayerState({ ...playerState, sound, ...newPlayerState })
+          setPlayerState({
+            ...newPlayerState,
+            sound
+          })
         }
       }
     })

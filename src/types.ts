@@ -11,3 +11,7 @@ export interface IMusic {
   fileUri: null | string
   artist: IArtist
 }
+export interface IPlaylist {
+  id: number
+  name: string
+}

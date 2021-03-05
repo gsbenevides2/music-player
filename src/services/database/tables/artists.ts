@@ -50,6 +50,12 @@ export function useArtistTable(database: DatabaseService) {
         const artists = rows as IDatabaseArtist[]
         return artists
       } else return []
+    },
+    async delete(artistId: string) {
+      await database.execSQLQuery({
+        sql: ['DELETE FROM artists WHERE id = ?'],
+        args: [artistId]
+      })
     }
   }
   return artistMethods

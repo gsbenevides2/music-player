@@ -25,7 +25,7 @@ const ImageAlbum: React.FC<ImageAlbumProps> = ({ url }) => {
         height: 50,
         marginRight: 16
       }}
-      source={{ uri: url }}
+      source={{ uri: url.replace('1000x1000', '300x300') }}
     />
   )
 }

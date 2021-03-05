@@ -1,8 +1,11 @@
-import * as SQLite from 'expo-sqlite'
 import * as FileSystem from 'expo-file-system'
-import * as Permisions from 'expo-permissions'
 import * as MediaLibrary from 'expo-media-library'
+import * as Permisions from 'expo-permissions'
+import * as SQLite from 'expo-sqlite'
 
+import { ArtistsTable } from './tables/artists'
+import { MusicsTable } from './tables/music'
+import { PlaylistsTable, PlaylistsMusicsTable } from './tables/playlists'
 import {
   DatabaseServiceImplementation,
   ExecSQLQueryReturn,
@@ -10,11 +13,8 @@ import {
   Query
 } from './types'
 
-import { ArtistsTable } from './tables/artists'
-import { MusicsTable } from './tables/music'
-
 export class DatabaseService implements DatabaseServiceImplementation {
-  _db = SQLite.openDatabase(`data.db`)
+  _db = SQLite.openDatabase('data.db')
 
   _parseQuery(query: Query): SQLite.Query {
     return {
@@ -22,7 +22,8 @@ export class DatabaseService implements DatabaseServiceImplementation {
       sql: query.sql.join(' ')
     }
   }
-  async _copyForDev() {
+
+  async _copyForDev(): Promise<void> {
     if (__DEV__) {
       await Permisions.askAsync(Permisions.CAMERA_ROLL)
       const fileUri = `${FileSystem.documentDirectory}SQLite/data.db`
@@ -30,6 +31,7 @@ export class DatabaseService implements DatabaseServiceImplementation {
       await MediaLibrary.createAlbumAsync('Download', asset, false)
     }
   }
+
   async execSQLQuery(query: Query): Promise<ExecSQLQueryReturn> {
     const result = await this.execSQLQueries([query])
     return {
@@ -37,6 +39,7 @@ export class DatabaseService implements DatabaseServiceImplementation {
       result: result.result ? result.result[0] : undefined
     }
   }
+
   execSQLQueries(queries: Query[]): Promise<ExecSQLQueriesReturn> {
     return new Promise(resolve => {
       this._db.exec(
@@ -52,16 +55,22 @@ export class DatabaseService implements DatabaseServiceImplementation {
       )
     })
   }
-  async enableForeignKeys() {
+
+  async enableForeignKeys(): Promise<void> {
     await this.execSQLQuery({
       sql: ['PRAGMA foreign_keys = ON;'],
       args: []
     })
   }
-  async createTables() {
+
+  async createTables(): Promise<void> {
     const artists = new ArtistsTable()
     const musics = new MusicsTable()
+    const playlists = new PlaylistsTable()
+    const playlistsMusics = new PlaylistsMusicsTable()
     await this.execSQLQuery(artists.createTable())
     await this.execSQLQuery(musics.createTable())
+    await this.execSQLQuery(playlists.createTable())
+    await this.execSQLQuery(playlistsMusics.createTable())
   }
 }

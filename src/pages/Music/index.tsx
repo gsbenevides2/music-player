@@ -1,6 +1,11 @@
 // eslint-disable-next-line no-use-before-define
 import React from 'react'
-import { View, useWindowDimensions, Image } from 'react-native'
+import {
+  View,
+  useWindowDimensions,
+  Image,
+  DeviceEventEmitter
+} from 'react-native'
 import { showMessage } from 'react-native-flash-message'
 import { Title, Paragraph, FAB } from 'react-native-paper'
 
@@ -12,6 +17,10 @@ import { useMusicTable } from '../../services/database/tables/music'
 import { IDeezerMusic } from '../../services/deezer'
 import { useHorizontal } from '../../useHorizontal'
 import styles from './styles'
+import {
+  useLoadFadedScreen,
+  LoadFadedScreen
+} from '../../components/LoadFadedScreen'
 
 interface ScreenParams {
   music: IDeezerMusic
@@ -27,9 +36,10 @@ export default function MusicScreen() {
   const database = useDatabase()
   const artistTable = useArtistTable(database)
   const musicTable = useMusicTable(database)
-
+  const loadedScreen = useLoadFadedScreen()
   const addMusicToDatabase = React.useCallback(async () => {
     try {
+      loadedScreen.open()
       async function checkMusicAlreadyExists(): Promise<void> {
         const music =
           (await musicTable.get(routeParams.music.id)) ||
@@ -59,7 +69,10 @@ export default function MusicScreen() {
         message: 'Música adicionada com sucesso',
         type: 'success'
       })
+      loadedScreen.close()
+      DeviceEventEmitter.emit('update-artists')
     } catch (e) {
+      loadedScreen.close()
       if (e.message === 'Code:01') {
         showMessage({
           message: 'Ops essa música ja esta na sua biblioteca',
@@ -96,6 +109,7 @@ export default function MusicScreen() {
         <Paragraph>YouTube Video ID: {routeParams.youtubeId}</Paragraph>
       </View>
       <FAB style={styles.fab} icon="plus" onPress={addMusicToDatabase} />
+      <LoadFadedScreen {...loadedScreen.props} />
     </View>
   )
 }

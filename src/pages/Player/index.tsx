@@ -4,6 +4,7 @@ import { View } from 'react-native'
 
 import { useNavigation } from '@react-navigation/native'
 
+import { getPlayerListenners } from '../../contexts/player/listenners'
 import { usePlayerContext } from '../../contexts/player/use'
 import { useHorizontal } from '../../useHorizontal'
 import { AlbumImageMemorized } from './components/AlbumImage'
@@ -12,7 +13,8 @@ import { MusicProgressBarMemorized } from './components/MusicProgressBar'
 import { PlayerButtonsMemorized } from './components/PlayerButtons'
 import { PlayerOptionsMemorized } from './components/PlayerOptions'
 import styles from './styles'
-import { getPlayerListenners } from '../../contexts/player/listenners'
+import { red50 } from 'react-native-paper/lib/typescript/styles/colors'
+import { AVPlaybackStatus } from 'expo-av'
 
 // eslint-disable-next-line @typescript-eslint/explicit-module-boundary-types
 export default function PlayerScreen() {
@@ -44,9 +46,8 @@ export default function PlayerScreen() {
   const handleToReproductionListScreen = React.useCallback(() => {
     navigation.navigate('ReproductionList')
   }, [])
-
-  React.useEffect(() => {
-    player.sound?.setOnPlaybackStatusUpdate(playbackStatus => {
+  const handlePlaybackStatusUpdate = React.useCallback(
+    (playbackStatus: AVPlaybackStatus) => {
       if (playbackStatus.isLoaded) {
         player.setTimeData(
           playbackStatus.durationMillis || 0,
@@ -59,7 +60,11 @@ export default function PlayerScreen() {
       } else {
         setIsPlaying(false)
       }
-    })
+    },
+    playerListennersData
+  )
+  React.useEffect(() => {
+    player.sound?.setOnPlaybackStatusUpdate(handlePlaybackStatusUpdate)
   }, playerListennersData)
   return (
     <View

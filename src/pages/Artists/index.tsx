@@ -4,9 +4,12 @@ import {
   TouchableOpacity,
   useWindowDimensions,
   FlatList,
-  Image
+  Image,
+  View,
+  DeviceEventEmitter,
+  RefreshControl
 } from 'react-native'
-import { Text } from 'react-native-paper'
+import { Text, Title, Subheading } from 'react-native-paper'
 
 import { useNavigation } from '@react-navigation/native'
 
@@ -38,7 +41,7 @@ const Artist: React.FC<ArtistProps> = props => {
           ...styles.artistImage
         }}
         source={{
-          uri: props.data.coverUrl
+          uri: props.data.coverUrl.replace('1000x1000', '500x500')
         }}
       />
       <Text style={styles.artistText}>{props.data.name}</Text>
@@ -47,7 +50,8 @@ const Artist: React.FC<ArtistProps> = props => {
 }
 const MemorizedArtist = React.memo(Artist)
 const ArtistsScreen: React.FC = () => {
-  const [artists, setArtists] = React.useState<IArtist[]>([])
+  const [artists, setArtists] = React.useState<IArtist[]>()
+  const [loading, setLoading] = React.useState(false)
   const database = useDatabase()
   const artistsTable = useArtistTable(database)
   const navigation = useNavigation()
@@ -68,21 +72,46 @@ const ArtistsScreen: React.FC = () => {
     ),
     []
   )
-  React.useEffect(() => {
-    async function load() {
-      const artists = await artistsTable.list()
-      setArtists(artists)
-    }
-    load()
+  const load = React.useCallback(async () => {
+    setLoading(true)
+    const artists = await artistsTable.list()
+    setArtists(artists)
+    setLoading(false)
   }, [])
-  return (
-    <FlatList
-      data={artists}
-      numColumns={3}
-      style={styles.container}
-      keyExtractor={item => item.id}
-      renderItem={renderItem}
-    />
-  )
+  React.useEffect(() => {
+    load()
+    const subscription = DeviceEventEmitter.addListener('update-artists', load)
+    return () => {
+      DeviceEventEmitter.removeSubscription(subscription)
+    }
+  }, [])
+  if (artists === undefined) {
+    return <View />
+  } else if (artists.length === 0) {
+    return (
+      <View style={{ alignItems: 'center' }}>
+        <Image
+          resizeMode={'contain'}
+          style={{ width: '80%', height: '80%' }}
+          source={require('../../assets/no_data.png')}
+        />
+        <Title>Sem músicas</Title>
+        <Subheading>Vá em "Opções" e clique em "Adicionar Música"</Subheading>
+      </View>
+    )
+  } else {
+    return (
+      <FlatList
+        data={artists}
+        numColumns={3}
+        refreshControl={
+          <RefreshControl refreshing={loading} onRefresh={load} />
+        }
+        style={styles.container}
+        keyExtractor={item => item.id}
+        renderItem={renderItem}
+      />
+    )
+  }
 }
 export default ArtistsScreen

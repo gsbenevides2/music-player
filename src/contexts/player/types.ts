@@ -31,7 +31,8 @@ export interface LoadedUsecontext {
   setShuffle: () => void
   setRepeat: () => void
   setTimeData: (to: number, from: number) => void
-  removeFromMusicList: (musicId: string) => void
+  removeMusicFromMusicList: (musicId: string) => Promise<void>
+  removeArtistFromMusicList: (artistId: string) => Promise<void>
   sound?: Audio.Sound
   musicActualy?: IMusic
   musicList?: IMusic[]

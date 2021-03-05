@@ -26,7 +26,7 @@ export interface IDatabaseMusic {
   artistId: string
 }
 
-interface IDatabaseMusicLeftJoinArtists extends IDatabaseMusic {
+export interface IDatabaseMusicLeftJoinArtists extends IDatabaseMusic {
   artistName: string
   artistCoverUrl: string
 }
@@ -45,23 +45,23 @@ interface UseMusicTableReturn {
   delete: (id: string) => Promise<void>
   list: () => Promise<IMusic[]>
 }
-export function useMusicTable(database: DatabaseService): UseMusicTableReturn {
-  function sanitizeDatabaseMusicResult(
-    databaseMusic: IDatabaseMusicLeftJoinArtists
-  ): IMusic {
-    return {
-      id: databaseMusic.id,
-      name: databaseMusic.name,
-      coverUrl: databaseMusic.coverUrl,
-      youtubeId: databaseMusic.youtubeId,
-      fileUri: databaseMusic.fileUri,
-      artist: {
-        id: databaseMusic.artistId,
-        name: databaseMusic.artistName,
-        coverUrl: databaseMusic.artistCoverUrl
-      }
+export function sanitizeDatabaseMusicResult(
+  databaseMusic: IDatabaseMusicLeftJoinArtists
+): IMusic {
+  return {
+    id: databaseMusic.id,
+    name: databaseMusic.name,
+    coverUrl: databaseMusic.coverUrl,
+    youtubeId: databaseMusic.youtubeId,
+    fileUri: databaseMusic.fileUri,
+    artist: {
+      id: databaseMusic.artistId,
+      name: databaseMusic.artistName,
+      coverUrl: databaseMusic.artistCoverUrl
     }
   }
+}
+export function useMusicTable(database: DatabaseService): UseMusicTableReturn {
   return {
     async get(id: string): Promise<IMusic | null> {
       const sqlResult = await database.execSQLQuery({
