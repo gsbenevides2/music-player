@@ -1,37 +1,228 @@
+// eslint-disable-next-line no-use-before-define
 import React from 'react'
-import {View, Image, useWindowDimensions, TouchableOpacity} from 'react-native'
-import {Title} from 'react-native-paper'
+import { View, ImageBackground, Image, DeviceEventEmitter } from 'react-native'
+import { showMessage } from 'react-native-flash-message'
+import { Title, Subheading, IconButton } from 'react-native-paper'
 
+import { useNavigation, useRoute } from '@react-navigation/native'
+
+import {
+  useLoadFadedScreen,
+  LoadFadedScreen
+} from '../../components/LoadFadedScreen'
 import MusicList from '../../components/MusicList'
-
+import { getPlayerListenners } from '../../contexts/player/listenners'
+import { usePlayerContext } from '../../contexts/player/use'
+import MusicInfo, { useMusicInfo } from '../../modals/MusicInfo'
+import {
+  SelectPlaylistModal,
+  useSelectPlaylistModal
+} from '../../modals/SelectPlalist'
+import { useDatabase } from '../../services/database'
+import { useArtistTable } from '../../services/database/tables/artists'
+import { useMusicTable } from '../../services/database/tables/music'
+import { usePlaylistsTable } from '../../services/database/tables/playlists'
+import { IArtist, IMusic } from '../../types'
 import styles from './styles'
 
-export default function HomeScreen(){
- // Calculate Image Width and Height
- const width = useWindowDimensions().width
- const margin = width * 0.1
- const imageWidthAndHeight = (width - (margin*2)) * 0.20
+interface ScreenParams {
+  artistId: string
+}
+const ArtistScreen: React.FC = () => {
+  const loadedScreen = useLoadFadedScreen()
+  const [artist, setArtist] = React.useState<IArtist | null>()
+  const [musics, setMusics] = React.useState<IMusic[]>()
+  const database = useDatabase()
+  const artistTable = useArtistTable(database)
+  const musicsTable = useMusicTable(database)
+  const player = usePlayerContext()
+  const route = useRoute()
+  const playerListenners = getPlayerListenners(player)
+  const navigation = useNavigation()
+  const plalistTable = usePlaylistsTable(database)
+  const plalistSelectorModal = useSelectPlaylistModal()
+  const { artistId } = route.params as ScreenParams
 
- return (
-	<View>
-	 <View style={styles.cardArtist}>
-		<TouchableOpacity style={styles.artistImage}>
-		 <Image
-			resizeMode='cover'
-			resizeMethod='auto'
-			style={{
-			 width:imageWidthAndHeight,
-				height:imageWidthAndHeight,
-				borderRadius:50
-			}}
-			source={{uri:'https://cdns-images.dzcdn.net/images/artist/4ff81f3d121817ed227c093ef8e777b9/1000x1000-000000-80-0-0.jpg'}}
+  const musicInfo = useMusicInfo()
+  const deleteMusic = React.useCallback(
+    async (musicId: string) => {
+      musicInfo.close()
+      loadedScreen.open()
+      try {
+        await musicsTable.delete(musicId)
+        setMusics(musics?.filter(music => music.id !== musicId))
+        await player.removeMusicFromMusicList(musicId)
+        showMessage({
+          message: 'Deletado com sucesso',
+          type: 'success'
+        })
+      } catch (e) {
+        showMessage({
+          message: 'Erro ao deletar',
+          type: 'danger'
+        })
+      } finally {
+        loadedScreen.close()
+      }
+    },
+    [musics, ...playerListenners]
+  )
 
-		/>
-	 </TouchableOpacity>
-	 <Title>Casting Crowns</Title>
-	</View>
-	<MusicList/>
- </View>
-)
+  const onPressMusic = React.useCallback(
+    async (musicId: string) => {
+      loadedScreen.open()
+      try {
+        const index = musics?.findIndex(music => music.id === musicId) as number
+        await player.startPlaylist(musics as IMusic[], index)
+      } finally {
+        loadedScreen.close()
+      }
+    },
+    [musics, ...playerListenners]
+  )
+  const onDeleteArtist = React.useCallback(async () => {
+    loadedScreen.open()
+    try {
+      await artistTable.delete(artistId)
+      await player.removeArtistFromMusicList(artistId)
+      navigation.goBack()
+      DeviceEventEmitter.emit('update-artists')
+      DeviceEventEmitter.emit('update-music-list', [artistId])
+      showMessage({
+        message: 'Deletado com sucesso',
+        type: 'success'
+      })
+    } catch (e) {
+      showMessage({
+        message: 'Erro ao deletar',
+        type: 'danger'
+      })
+    } finally {
+      loadedScreen.close()
+    }
+  }, [])
+  const onMoreCallback = React.useCallback(
+    async (musicId: string) => {
+      const music = musics?.find(music => music.id === musicId) as IMusic
+      musicInfo.open({
+        id: music.id,
+        name: music.name,
+        artist: {
+          id: music.artist.id,
+          name: music.artist.name
+        }
+      })
+    },
+    [musics]
+  )
+
+  const openPlaylitsSelector = React.useCallback(async () => {
+    musicInfo.close()
+    const playlists = await plalistTable.list()
+    plalistSelectorModal.setPlaylists(playlists)
+    plalistSelectorModal.open()
+  }, [])
+  const addMusicToPlaylist = React.useCallback(
+    async (playlistId: number) => {
+      try {
+        await plalistTable.addToPlalist(playlistId, musicInfo.data.id)
+        showMessage({
+          type: 'success',
+          message: 'Adicionado com sucesso'
+        })
+      } finally {
+        plalistSelectorModal.close()
+      }
+    },
+    [musicInfo.data.id]
+  )
+  React.useEffect(() => {
+    async function loadArtistData() {
+      const artist = await artistTable.getArtist(artistId)
+      setArtist(artist)
+      const HeaderRight = () => (
+        <IconButton icon="delete" onPress={onDeleteArtist} size={25} />
+      )
+
+      if (artist)
+        navigation.setOptions({
+          title: artist.name,
+          headerRight: HeaderRight
+        })
+    }
+    loadArtistData()
+    async function loadMusics() {
+      const musics = await musicsTable.getByArtistId(artistId)
+      setMusics(musics)
+    }
+    loadMusics()
+    navigation.setOptions({})
+  }, [])
+  if (!artist) {
+    return <View />
+  } else if (musics?.length === 0) {
+    return (
+      <View style={{ flex: 1 }}>
+        <ImageBackground
+          source={{ uri: artist.coverUrl.replace('1000x1000', '800x800') }}
+          style={styles.container}
+        >
+          <View style={{ ...styles.overlay, alignItems: 'center' }}>
+            <Image
+              resizeMode={'contain'}
+              style={{ width: '80%', height: '80%' }}
+              source={require('../../assets/no_data.png')}
+            />
+            <Title>Sem músicas</Title>
+            <Subheading>
+              Este artista nāo tem músicas em sua biblioteca
+            </Subheading>
+          </View>
+          <LoadFadedScreen {...loadedScreen.props} />
+        </ImageBackground>
+      </View>
+    )
+  } else if (musics?.length) {
+    return (
+      <View style={{ flex: 1 }}>
+        <ImageBackground
+          source={{ uri: artist.coverUrl.replace('1000x1000', '800x800') }}
+          style={styles.container}
+        >
+          <View style={styles.overlay}>
+            <MusicList
+              musics={musics}
+              onMore={onMoreCallback}
+              onPress={onPressMusic}
+            />
+          </View>
+        </ImageBackground>
+        <LoadFadedScreen {...loadedScreen.props} />
+        <MusicInfo
+          visible={musicInfo.visible}
+          close={musicInfo.close}
+          data={musicInfo.data}
+          methods={{ deleteMusic, addMusicToPlaylist: openPlaylitsSelector }}
+        />
+        <SelectPlaylistModal
+          {...plalistSelectorModal.props}
+          next={addMusicToPlaylist}
+        />
+      </View>
+    )
+  } else {
+    return (
+      <View style={{ flex: 1 }}>
+        <ImageBackground
+          source={{ uri: artist.coverUrl.replace('1000x1000', '800x800') }}
+          style={styles.container}
+        >
+          <View style={styles.overlay}></View>
+          <LoadFadedScreen {...loadedScreen.props} />
+        </ImageBackground>
+      </View>
+    )
+  }
 }
 
+export default ArtistScreen

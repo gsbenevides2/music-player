@@ -1,11 +1,12 @@
 // eslint-disable-next-line no-use-before-define
 import React from 'react'
-import { View, Text } from 'react-native'
+import { Text, ScrollView } from 'react-native'
 import { showMessage } from 'react-native-flash-message'
 import { List } from 'react-native-paper'
 
 import { useNavigation } from '@react-navigation/native'
 import * as WebBrowser from 'expo-web-browser'
+
 import {
   LoadFadedScreen,
   useLoadFadedScreen
@@ -31,6 +32,8 @@ const UserScreen: React.FC = () => {
       )
       loadedScreen.close()
       navigation.navigate('SelectMusic', { resultForDeezer, resultForYoutube })
+      urlInfo.close()
+      urlInfo.clear()
     } catch (e) {
       showMessage({
         message: 'Ocorreu um erro, verifique a url',
@@ -43,11 +46,14 @@ const UserScreen: React.FC = () => {
   const handleToAllMusics = React.useCallback(() => {
     navigation.navigate('AllMusics')
   }, [])
+  const handleToPlaylists = React.useCallback(() => {
+    navigation.navigate('Playlists')
+  }, [])
   const handleAbout = React.useCallback(() => {
     WebBrowser.openBrowserAsync('https://github.com/gsbenevides2/music-player')
   }, [])
   return (
-    <View style={styles.container}>
+    <ScrollView style={styles.container}>
       <Text style={styles.title}>Olá, tudo bem?</Text>
       <List.Item
         onPress={urlInfo.open}
@@ -62,18 +68,20 @@ const UserScreen: React.FC = () => {
         left={props => <List.Icon {...props} icon="view-list" />}
       />
       <List.Item
+        title="Playlists"
+        description="Ordene suas músicas atravez de playlists"
+        onPress={handleToPlaylists}
+        left={props => <List.Icon {...props} icon="playlist-music" />}
+      />
+      <List.Item
         onPress={handleAbout}
         title="Sobre o Aplicativo"
         description="Sobre, Codigo-Aberto, Contato"
         left={props => <List.Icon {...props} icon="information" />}
       />
-      <UrlInfo
-        visible={urlInfo.visible}
-        close={urlInfo.close}
-        next={urlInfo.next}
-      />
+      <UrlInfo {...urlInfo.props} />
       <LoadFadedScreen {...loadedScreen.props} />
-    </View>
+    </ScrollView>
   )
 }
 export default UserScreen

@@ -1,12 +1,17 @@
 // eslint-disable-next-line no-use-before-define
 import React from 'react'
+
 import AsyncStorage from '@react-native-async-storage/async-storage'
 import { Audio } from 'expo-av'
 
-import { ContextType, PlayerState } from './types'
 import { YoutubeService } from '../../services/youtube'
+import { ContextType, PlayerState } from './types'
 
 export const PlayerContext = React.createContext<ContextType>(undefined)
+
+interface AsyncStoragePlayerState extends PlayerState {
+  sound: undefined
+}
 
 export const PlayerProvider: React.FC = ({ children }) => {
   Audio.setAudioModeAsync({
@@ -24,7 +29,7 @@ export const PlayerProvider: React.FC = ({ children }) => {
   React.useEffect(() => {
     AsyncStorage.getItem('playerContext').then(async value => {
       if (value) {
-        const newPlayerState = JSON.parse(value) as PlayerState
+        const newPlayerState = JSON.parse(value) as AsyncStoragePlayerState
         if (newPlayerState.musicActualy) {
           const youtubeService = new YoutubeService()
           const musicUrl = await youtubeService.getMusicPlayUrl(
@@ -38,13 +43,15 @@ export const PlayerProvider: React.FC = ({ children }) => {
               positionMillis: newPlayerState.timeDataFrom
             }
           )
-          setPlayerState({ ...playerState, sound, ...newPlayerState })
+          setPlayerState({
+            ...newPlayerState,
+            sound
+          })
         }
       }
     })
   }, [])
   React.useEffect(() => {
-    console.log('OK')
     const serializedPlayerState = { ...playerState, sound: undefined }
     AsyncStorage.setItem('playerContext', JSON.stringify(serializedPlayerState))
   }, [

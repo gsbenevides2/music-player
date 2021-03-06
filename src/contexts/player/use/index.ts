@@ -8,7 +8,8 @@ import { pauseMusic } from './pauseMusic'
 import { playMusic } from './playMusic'
 import { playNext } from './playNext'
 import { playPrevious } from './playPrevious'
-import { removeFromMusicList } from './removeFromMusicList'
+import { removeArtistFromMusicList } from './removeArtistFromMusicList'
+import { removeMusicFromMusicList } from './removeMusicFromMusicList'
 import { setMusicList } from './setMusicList'
 import { setRepeat } from './setRepeat'
 import { setShuffle } from './setShuffle'
@@ -29,7 +30,14 @@ export function usePlayerContext(): LoadedUsecontext {
     setShuffle: setShuffle(playerContext),
     setRepeat: setRepeat(playerContext),
     setTimeData: setTimeData(playerContext),
-    removeFromMusicList: removeFromMusicList(playerContext, youtubeService),
+    removeMusicFromMusicList: removeMusicFromMusicList(
+      playerContext,
+      youtubeService
+    ),
+    removeArtistFromMusicList: removeArtistFromMusicList(
+      playerContext,
+      youtubeService
+    ),
     ...playerContext?.playerState
   }
 }

@@ -19,12 +19,13 @@ interface ImageAlbumProps {
 const ImageAlbum: React.FC<ImageAlbumProps> = ({ url }) => {
   return (
     <Image
+      resizeMethod="resize"
       style={{
         width: 50,
         height: 50,
         marginRight: 16
       }}
-      source={{ uri: url }}
+      source={{ uri: url.replace('1000x1000', '300x300') }}
     />
   )
 }

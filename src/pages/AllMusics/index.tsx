@@ -1,15 +1,26 @@
-/* eslint-disable multiline-ternary */
 // eslint-disable-next-line no-use-before-define
 import React from 'react'
-import { View, Image } from 'react-native'
+import { View, Image, DeviceEventEmitter } from 'react-native'
+import { showMessage } from 'react-native-flash-message'
 import { Title, Subheading } from 'react-native-paper'
 
+import { useNavigation } from '@react-navigation/native'
+
+import {
+  useLoadFadedScreen,
+  LoadFadedScreen
+} from '../../components/LoadFadedScreen'
 import MusicList from '../../components/MusicList'
 import { getPlayerListenners } from '../../contexts/player/listenners'
 import { usePlayerContext } from '../../contexts/player/use'
 import MusicInfo, { useMusicInfo } from '../../modals/MusicInfo'
+import {
+  SelectPlaylistModal,
+  useSelectPlaylistModal
+} from '../../modals/SelectPlalist'
 import { useDatabase } from '../../services/database'
 import { useMusicTable } from '../../services/database/tables/music'
+import { usePlaylistsTable } from '../../services/database/tables/playlists'
 import { IMusic } from '../../types'
 
 const NoMusic: React.FC = () => (
@@ -27,56 +38,124 @@ const NoMusic: React.FC = () => (
 )
 
 const AllMusicsScreen: React.FC = () => {
-  const [musics, setMusics] = React.useState<IMusic[]>([])
+  const loadedScreen = useLoadFadedScreen()
+  const navigation = useNavigation()
+  const [musics, setMusics] = React.useState<IMusic[]>()
   const database = useDatabase()
   const musicTable = useMusicTable(database)
+  const plalistTable = usePlaylistsTable(database)
+  const plalistSelectorModal = useSelectPlaylistModal()
   const player = usePlayerContext()
   const playerListenners = [musics, ...getPlayerListenners(player)]
   const musicInfo = useMusicInfo()
   const deleteMusic = React.useCallback((musicId: string) => {
-    musicTable.delete(musicId).then(() => {
-      setMusics(musics.filter(music => music.id !== musicId))
-      player.removeFromMusicList(musicId)
-      musicInfo.close()
-    })
+    musicInfo.close()
+    loadedScreen.open()
+    musicTable
+      .delete(musicId)
+      .then(() => {
+        setMusics(musics?.filter(music => music.id !== musicId))
+        player.removeMusicFromMusicList(musicId)
+        loadedScreen.close()
+        showMessage({
+          type: 'success',
+          message: 'Musica deletada'
+        })
+      })
+      .catch(() => {
+        showMessage({
+          type: 'danger',
+          message: 'Ocorreu um erro ao deletar a musica.'
+        })
+        loadedScreen.close()
+      })
   }, playerListenners)
+  const handleToArtist = React.useCallback((artistId: string) => {
+    navigation.navigate('Artist', { artistId })
+  }, [])
   const musicPressCallback = React.useCallback(async (musicId: string) => {
-    const musicIndex = musics.findIndex(music => music.id === musicId)
-    await player.startPlaylist(musics, musicIndex)
+    loadedScreen.open()
+    try {
+      const musicIndex = musics?.findIndex(music => music.id === musicId)
+      await player.startPlaylist(musics as IMusic[], musicIndex as number)
+    } finally {
+      loadedScreen.close()
+    }
   }, playerListenners)
   const onMoreCallback = React.useCallback(async (musicId: string) => {
-    const music = (await musicTable.get(musicId)) as IMusic
+    const music = musics?.find(music => music.id === musicId) as IMusic
     musicInfo.open({
       id: music.id,
       name: music.name,
-      artist: music.artist.name
+      artist: {
+        id: music.artist.id,
+        name: music.artist.name
+      }
     })
   }, playerListenners)
+  const openPlaylitsSelector = React.useCallback(async () => {
+    musicInfo.close()
+    const playlists = await plalistTable.list()
+    plalistSelectorModal.setPlaylists(playlists)
+    plalistSelectorModal.open()
+  }, [])
+  const addMusicToPlaylist = React.useCallback(
+    async (playlistId: number) => {
+      try {
+        await plalistTable.addToPlalist(playlistId, musicInfo.data.id)
+        showMessage({
+          type: 'success',
+          message: 'Adicionado com sucesso'
+        })
+      } finally {
+        plalistSelectorModal.close()
+      }
+    },
+    [musicInfo.data.id]
+  )
   React.useEffect(() => {
     async function load() {
       const musics = await musicTable.list()
       setMusics(musics)
     }
     load()
+    const subscription = DeviceEventEmitter.addListener(
+      'update-music-list',
+      load
+    )
+    return () => {
+      DeviceEventEmitter.removeSubscription(subscription)
+    }
   }, [])
-  return (
-    <View>
-      {musics.length ? (
+  if (musics === undefined) {
+    return <View />
+  } else if (!musics.length) {
+    return <NoMusic />
+  } else {
+    return (
+      <View>
         <MusicList
           onMore={onMoreCallback}
           musics={musics}
           onPress={musicPressCallback}
         />
-      ) : (
-        <NoMusic />
-      )}
-      <MusicInfo
-        visible={musicInfo.visible}
-        close={musicInfo.close}
-        data={musicInfo.data}
-        methods={{ deleteMusic }}
-      />
-    </View>
-  )
+        <LoadFadedScreen {...loadedScreen.props} />
+        <MusicInfo
+          visible={musicInfo.visible}
+          close={musicInfo.close}
+          data={musicInfo.data}
+          methods={{
+            deleteMusic,
+            handleToArtist,
+            addMusicToPlaylist: openPlaylitsSelector
+          }}
+        />
+        <SelectPlaylistModal
+          {...plalistSelectorModal.props}
+          next={addMusicToPlaylist}
+        />
+      </View>
+    )
+  }
 }
 export default AllMusicsScreen
