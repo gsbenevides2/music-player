@@ -1,3 +1,4 @@
+/* eslint-disable camelcase */
 import {
   Database,
   Query as SQLiteQuery,
@@ -34,7 +35,9 @@ export interface DatabaseServiceImplementation {
   execSQLQuery(query: Query): Promise<ExecSQLQueryReturn>
   execSQLQueries(queries: Query[]): Promise<ExecSQLQueriesReturn>
   enableForeignKeys(): Promise<unknown>
-  //_updateDatabase(from:number, to:number):Promise<void>;
+  // _updateDatabase(from:number, to:number):Promise<void>;
   createTables(): Promise<void>
-  //getMusic(musicId:string):Promise<GetMusicReturns>
+  deleteDb(): Promise<void>
+  exportDatabase(): Promise<void>
+  importDatabase(): Promise<void>
 }

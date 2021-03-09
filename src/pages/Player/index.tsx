@@ -3,22 +3,25 @@ import React from 'react'
 import { View } from 'react-native'
 
 import { useNavigation } from '@react-navigation/native'
+import { AVPlaybackStatus } from 'expo-av'
 
+import { getPlayerListenners } from '../../contexts/player/listenners'
 import { usePlayerContext } from '../../contexts/player/use'
 import { useHorizontal } from '../../useHorizontal'
+import { onNetworkUpdatesInPlayer } from '../NoNetwork'
 import { AlbumImageMemorized } from './components/AlbumImage'
 import { MusicDataMemorized } from './components/MusicData'
 import { MusicProgressBarMemorized } from './components/MusicProgressBar'
 import { PlayerButtonsMemorized } from './components/PlayerButtons'
 import { PlayerOptionsMemorized } from './components/PlayerOptions'
 import styles from './styles'
-import { getPlayerListenners } from '../../contexts/player/listenners'
 
 // eslint-disable-next-line @typescript-eslint/explicit-module-boundary-types
 export default function PlayerScreen() {
   const navigation = useNavigation()
   const player = usePlayerContext()
   const horizontal = useHorizontal()
+  onNetworkUpdatesInPlayer()
   const playerListennersData = getPlayerListenners(player)
   const [isPlaying, setIsPlaying] = React.useState(false)
 
@@ -44,9 +47,8 @@ export default function PlayerScreen() {
   const handleToReproductionListScreen = React.useCallback(() => {
     navigation.navigate('ReproductionList')
   }, [])
-
-  React.useEffect(() => {
-    player.sound?.setOnPlaybackStatusUpdate(playbackStatus => {
+  const handlePlaybackStatusUpdate = React.useCallback(
+    (playbackStatus: AVPlaybackStatus) => {
       if (playbackStatus.isLoaded) {
         player.setTimeData(
           playbackStatus.durationMillis || 0,
@@ -59,7 +61,11 @@ export default function PlayerScreen() {
       } else {
         setIsPlaying(false)
       }
-    })
+    },
+    playerListennersData
+  )
+  React.useEffect(() => {
+    player.sound?.setOnPlaybackStatusUpdate(handlePlaybackStatusUpdate)
   }, playerListennersData)
   return (
     <View
@@ -107,8 +113,8 @@ export default function PlayerScreen() {
 }
 
 /*
- * Old Code for future implementation
+	* Old Code for future implementation
 import MusicInfo, { useMusicInfo } from '../../modals/MusicInfo'
-  const musicInfo = useMusicInfo()
+		const musicInfo = useMusicInfo()
 					<MusicInfo visible={musicInfo.visible} close={musicInfo.close} />
- */
+	*/

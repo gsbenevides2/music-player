@@ -2,7 +2,7 @@
 import React from 'react'
 import { Image } from 'react-native'
 import DraggableFlatList from 'react-native-draggable-flatlist'
-import { List, Button } from 'react-native-paper'
+import { List, IconButton } from 'react-native-paper'
 
 interface Music {
   id: string
@@ -11,6 +11,7 @@ interface Music {
     name: string
   }
   coverUrl: string
+  playlistItemId?: number
 }
 
 interface ImageAlbumProps {
@@ -19,12 +20,13 @@ interface ImageAlbumProps {
 const ImageAlbum: React.FC<ImageAlbumProps> = ({ url }) => {
   return (
     <Image
+      resizeMethod="resize"
       style={{
         width: 50,
         height: 50,
         marginRight: 16
       }}
-      source={{ uri: url }}
+      source={{ uri: url.replace('1000x1000', '300x300') }}
     />
   )
 }
@@ -51,14 +53,16 @@ const Item: React.FC<ItemProps> = props => {
       onLongPress={props.onDrag}
       left={() => <ImageAlbum url={music.coverUrl} />}
       right={propsIcon =>
-        props.onMore ? (
-          <Button
+        props.onMore
+? (
+          <IconButton
             onPress={onMoreCallback}
             color={propsIcon.color}
-            style={{ ...propsIcon.style, borderRadius: 50 }}
+            style={{ ...propsIcon.style, marginRight: 24 }}
             icon="dots-vertical"
           />
-        ) : undefined
+        )
+: undefined
       }
     />
   )
@@ -85,7 +89,9 @@ const MusicListDrag: React.FC<MusicLIstProps> = props => {
           music={item}
         />
       )}
-      keyExtractor={item => item.id}
+      keyExtractor={item =>
+        item.playlistItemId ? item.playlistItemId.toString() : item.id
+      }
       onDragEnd={({ data }) => props.onMusicListChange(data)}
     />
   )

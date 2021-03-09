@@ -14,6 +14,15 @@ export interface PlayerState {
   timeDataFrom: number
 }
 
+export interface AsyncStoragePlayerState {
+  sound: undefined
+  musicActualy?: IMusic
+  musicList: IMusic[]
+  isShuffle: boolean
+  isRepeat: boolean
+  timeDataTo: number
+  timeDataFrom: number
+}
 export interface ContextInterface {
   playerState: PlayerState
   setPlayerState: React.Dispatch<React.SetStateAction<PlayerState>>
@@ -31,7 +40,9 @@ export interface LoadedUsecontext {
   setShuffle: () => void
   setRepeat: () => void
   setTimeData: (to: number, from: number) => void
-  removeFromMusicList: (musicId: string) => void
+  removeMusicFromMusicList: (musicId: string) => Promise<void>
+  removeArtistFromMusicList: (artistId: string) => Promise<void>
+  clearData: () => Promise<void>
   sound?: Audio.Sound
   musicActualy?: IMusic
   musicList?: IMusic[]

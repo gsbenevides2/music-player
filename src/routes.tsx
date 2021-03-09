@@ -7,18 +7,17 @@ import { NavigationContainer, DarkTheme } from '@react-navigation/native'
 import { createStackNavigator } from '@react-navigation/stack'
 
 import AllMusicsScreen from './pages/AllMusics'
+import ArtistScreen from './pages/Artist'
+import ArtistsScreen from './pages/Artists'
 import MusicScreen from './pages/Music'
+import NoNetworkScreen from './pages/NoNetwork'
+import OptionsScreen from './pages/Options'
 import PlayerScreen from './pages/Player'
+import PlaylistScreen from './pages/Playlist'
+import PlaylistsScreen from './pages/Playlists'
 import ReproductionListScreen from './pages/ReproductionList'
 import SelectMusicScreen from './pages/SelectMusic'
 import SplashScreen from './pages/Splash'
-import UserScreen from './pages/User'
-
-// import ArtistsScreen from './pages/Artists'
-// import PlaylistsScreen from './pages/Playlists'
-// import ArtistScreen from './pages/Artist'
-// import PlaylistScreen from './pages/Playlist'
-
 function TabsRoutes() {
   const Tabs = createMaterialBottomTabNavigator()
   return (
@@ -34,15 +33,28 @@ function TabsRoutes() {
         component={PlayerScreen}
       />
       <Tabs.Screen
+        name="Artists"
+        options={{
+          title: 'Artistas',
+          // eslint-disable-next-line react/display-name
+          tabBarIcon: ({ color }) => {
+            return (
+              <MaterialCommunityIcons name="account" size={24} color={color} />
+            )
+          }
+        }}
+        component={ArtistsScreen}
+      />
+      <Tabs.Screen
         name="Options"
         options={{
           // eslint-disable-next-line react/display-name
           tabBarIcon: ({ color }) => (
-            <MaterialCommunityIcons name="account" size={24} color={color} />
+            <MaterialCommunityIcons name="cog" size={24} color={color} />
           ),
           title: 'Opções'
         }}
-        component={UserScreen}
+        component={OptionsScreen}
       />
     </Tabs.Navigator>
   )
@@ -59,6 +71,13 @@ const Routes: React.FC = () => {
             headerShown: false
           }}
           component={SplashScreen}
+        />
+        <Stack.Screen
+          name="NoNetworkScreen"
+          options={{
+            headerShown: false
+          }}
+          component={NoNetworkScreen}
         />
         <Stack.Screen
           name="tabs"
@@ -88,7 +107,26 @@ const Routes: React.FC = () => {
           }}
           component={ReproductionListScreen}
         />
-        <Stack.Screen name="Music" component={MusicScreen} />
+        <Stack.Screen
+          name="Artist"
+          options={{ title: '' }}
+          component={ArtistScreen}
+        />
+        <Stack.Screen
+          name="Music"
+          options={{ title: '' }}
+          component={MusicScreen}
+        />
+        <Stack.Screen
+          name="Playlists"
+          options={{ title: 'Playlists' }}
+          component={PlaylistsScreen}
+        />
+        <Stack.Screen
+          name="Playlist"
+          options={{ title: '' }}
+          component={PlaylistScreen}
+        />
       </Stack.Navigator>
     </NavigationContainer>
   )

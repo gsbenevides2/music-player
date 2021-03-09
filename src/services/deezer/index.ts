@@ -119,9 +119,9 @@ export class DeezerService implements DeezerServciceInterface {
         artist: {
           id: String(music.artist.id),
           name: music.artist.name,
-          coverUrl: music.artist.picture_xl
+          coverUrl: music.artist.picture_big
         },
-        coverUrl: music.album.cover_xl
+        coverUrl: music.album.cover_big
       }
     })
 

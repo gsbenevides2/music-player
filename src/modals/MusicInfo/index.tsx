@@ -6,10 +6,17 @@ import { Portal, Dialog, Paragraph, Button } from 'react-native-paper'
 interface MusicData {
   id: string
   name: string
-  artist: string
+  artist: {
+    name: string
+    id: string
+  }
+  playlistItemId?: number
 }
 interface Methods {
+  handleToArtist?: (artistId: string) => void
   removeFromMusicList?: (musicId: string) => void
+  addMusicToPlaylist?: (musicId: string) => void
+  removeMusicFromPlaylist?: (playlistItemId: number) => void
   deleteMusic: (musicId: string) => void
 }
 interface Props {
@@ -19,10 +26,13 @@ interface Props {
   methods: Methods
 }
 interface useMusicInfoCallback {
-  visible: boolean
+  props: {
+    visible: boolean
+    close: () => void
+    data: MusicData
+  }
   open: (musicData: MusicData) => void
   close: () => void
-  data: MusicData
 }
 
 export const useMusicInfo = (): useMusicInfoCallback => {
@@ -30,7 +40,10 @@ export const useMusicInfo = (): useMusicInfoCallback => {
   const [musicData, setMusicData] = React.useState<MusicData>({
     id: '',
     name: '',
-    artist: ''
+    artist: {
+      id: '',
+      name: ''
+    }
   })
   const close = React.useCallback(() => {
     setVisible(false)
@@ -40,10 +53,13 @@ export const useMusicInfo = (): useMusicInfoCallback => {
     setMusicData(musicData)
   }, [])
   return {
-    visible,
+    props: {
+      visible,
+      close,
+      data: musicData
+    },
     open,
-    close,
-    data: musicData
+    close
   }
 }
 
@@ -58,10 +74,39 @@ const MusicInfo: React.FC<Props> = props => {
         <Dialog.Title>Informações da Música</Dialog.Title>
         <Dialog.Content>
           <Paragraph>Nome da Música: {props.data.name}</Paragraph>
-          <Paragraph>Nome do Artista: {props.data.artist}</Paragraph>
-          {/*<Button onPress={hideDialog}>Ver foto de capa</Button>
-          <Button onPress={hideDialog}>Ver artista</Button>
-					<Button onPress={hideDialog}>Baixar</Button>*/}
+          <Paragraph>Nome do Artista: {props.data.artist.name}</Paragraph>
+          {props.methods.handleToArtist ? (
+            <Button
+              onPress={() => {
+                props.close()
+                props.methods.handleToArtist?.(props.data.artist.id)
+              }}
+            >
+              Ver artista
+            </Button>
+          ) : undefined}
+          {props.methods.addMusicToPlaylist ? (
+            <Button
+              onPress={() => {
+                props.close()
+                props.methods.addMusicToPlaylist?.(props.data.artist.id)
+              }}
+            >
+              Adicionar a uma playlist
+            </Button>
+          ) : undefined}
+          {props.methods.removeMusicFromPlaylist ? (
+            <Button
+              onPress={() => {
+                props.close()
+                props.methods.removeMusicFromPlaylist?.(
+                  props.data.playlistItemId as number
+                )
+              }}
+            >
+              Remover desta playlist
+            </Button>
+          ) : undefined}
           {props.methods.removeFromMusicList ? (
             <Button
               onPress={() => props.methods.removeFromMusicList?.(props.data.id)}

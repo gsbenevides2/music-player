@@ -1,4 +1,5 @@
 import { Sound } from 'expo-av/build/Audio'
+import * as Network from 'expo-network'
 
 import { YoutubeService } from '../../../services/youtube'
 import { ContextType } from '../types'
@@ -8,6 +9,10 @@ export const playPrevious = (
   youtubeService: YoutubeService
 ) => {
   return async (): Promise<void> => {
+    const networkState = await Network.getNetworkStateAsync()
+    if (!networkState.isInternetReachable) {
+      throw new Error('t1')
+    }
     const sound = playerContext?.playerState.sound as Sound
     const actualIndex = playerContext?.playerState.musicList.findIndex(
       music => music.id === playerContext.playerState.musicActualy?.id

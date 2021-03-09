@@ -1,11 +1,20 @@
 // eslint-disable-next-line no-use-before-define
 import React from 'react'
-import { View, useWindowDimensions, Image } from 'react-native'
+import {
+  View,
+  useWindowDimensions,
+  Image,
+  DeviceEventEmitter
+} from 'react-native'
 import { showMessage } from 'react-native-flash-message'
 import { Title, Paragraph, FAB } from 'react-native-paper'
 
 import { useNavigation, useRoute, StackActions } from '@react-navigation/native'
 
+import {
+  useLoadFadedScreen,
+  LoadFadedScreen
+} from '../../components/LoadFadedScreen'
 import { useDatabase } from '../../services/database'
 import { useArtistTable } from '../../services/database/tables/artists'
 import { useMusicTable } from '../../services/database/tables/music'
@@ -27,9 +36,10 @@ export default function MusicScreen() {
   const database = useDatabase()
   const artistTable = useArtistTable(database)
   const musicTable = useMusicTable(database)
-
+  const loadedScreen = useLoadFadedScreen()
   const addMusicToDatabase = React.useCallback(async () => {
     try {
+      loadedScreen.open()
       async function checkMusicAlreadyExists(): Promise<void> {
         const music =
           (await musicTable.get(routeParams.music.id)) ||
@@ -59,14 +69,16 @@ export default function MusicScreen() {
         message: 'Música adicionada com sucesso',
         type: 'success'
       })
+      loadedScreen.close()
+      DeviceEventEmitter.emit('update-artists')
     } catch (e) {
+      loadedScreen.close()
       if (e.message === 'Code:01') {
         showMessage({
           message: 'Ops essa música ja esta na sua biblioteca',
           type: 'danger'
         })
       } else {
-        console.error(e.message)
         showMessage({
           message: 'Erro desconhecido',
           type: 'danger'
@@ -96,6 +108,7 @@ export default function MusicScreen() {
         <Paragraph>YouTube Video ID: {routeParams.youtubeId}</Paragraph>
       </View>
       <FAB style={styles.fab} icon="plus" onPress={addMusicToDatabase} />
+      <LoadFadedScreen {...loadedScreen.props} />
     </View>
   )
 }

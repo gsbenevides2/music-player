@@ -1,62 +1,69 @@
+// eslint-disable-next-line no-use-before-define
 import React from 'react'
-import { 
- Portal, 
- Dialog, 
- Button,
- TextInput
-} from 'react-native-paper'
+import { Keyboard } from 'react-native'
+import { Portal, Dialog, Button, TextInput } from 'react-native-paper'
 
 interface Props {
- visible:boolean
- close:()=>void
- next:(url:string)=>void
+  url: string
+  setUrl: React.Dispatch<React.SetStateAction<string>>
+  visible: boolean
+  close: () => void
+  next: (url: string) => void
+}
+interface UseUrlInfoReturn {
+  props: {
+    url: string
+    setUrl: React.Dispatch<React.SetStateAction<string>>
+    visible: boolean
+    close: () => void
+  }
+  clear: () => void
+  open: () => void
+  close: () => void
+}
+export const useUrlInfo = (): UseUrlInfoReturn => {
+  const [url, setUrl] = React.useState('')
+  const [visible, setVisible] = React.useState(false)
+  const close = React.useCallback(() => {
+    setVisible(false)
+  }, [])
+  const open = React.useCallback(() => {
+    setVisible(true)
+  }, [])
+  const clear = React.useCallback(() => {
+    setUrl('')
+  }, [])
+  return { props: { url, setUrl, visible, close }, clear, open, close }
 }
 
-export const useUrlInfo = (callback:(url:string)=>void)=>{
- const [visible, setVisible] = React.useState(false)
- const close = React.useCallback(()=>{
-	setVisible(false)
- },[])
- const open = React.useCallback(()=>{
-	setVisible(true)
- },[])
- const next = React.useCallback((url:string)=>{
-	 callback(url)
- },[])
- return {visible, open, close, next}
-}
-
-const UrlInfo:React.FC<Props> = (props)=>{
- const [url, setUrl] = React.useState('')
- const next = React.useCallback(()=>{
-   props.next(url)
-   props.close()
- },[url])
- const hideDialog = React.useCallback(()=>{
-	props.close()
- },[])
-
- return (
-	<Portal>
-	 <Dialog 
-		visible={props.visible}
-		dismissable={false}>
-		<Dialog.Title>Insira a URL do Youtube</Dialog.Title>
-		<Dialog.Content>
-		 <TextInput
-			value={url}
-			onEndEditing={next}
-			onChangeText={text=>setUrl(text)}
-			label='URL do Vídeo'
-		 />
-		</Dialog.Content>
-		<Dialog.Actions>
-		 <Button onPress={hideDialog}>Sair</Button>
-		 <Button onPress={next}>Continuar</Button>
-		</Dialog.Actions>
-	 </Dialog>
-	</Portal>
- )
+const UrlInfo: React.FC<Props> = props => {
+  return (
+    <Portal>
+      <Dialog visible={props.visible} dismissable={false}>
+        <Dialog.Title>Insira a URL do Youtube</Dialog.Title>
+        <Dialog.Content>
+          <TextInput
+            value={props.url}
+            onEndEditing={() => {
+              props.next(props.url)
+            }}
+            onChangeText={text => props.setUrl(text)}
+            label="URL do Vídeo"
+          />
+        </Dialog.Content>
+        <Dialog.Actions>
+          <Button onPress={props.close}>Sair</Button>
+          <Button
+            onPress={() => {
+              props.next(props.url)
+            }}
+          >
+            Continuar
+          </Button>
+        </Dialog.Actions>
+      </Dialog>
+    </Portal>
+  )
 }
 
 export default UrlInfo

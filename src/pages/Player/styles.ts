@@ -17,6 +17,7 @@ export default StyleSheet.create({
   controlsAreaHorizontal: {
     flex: 1,
     width: '100%',
+    alignItems: 'center',
     paddingLeft: 12,
     flexDirection: 'column'
   },
