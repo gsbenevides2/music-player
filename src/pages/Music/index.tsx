@@ -11,16 +11,16 @@ import { Title, Paragraph, FAB } from 'react-native-paper'
 
 import { useNavigation, useRoute, StackActions } from '@react-navigation/native'
 
+import {
+  useLoadFadedScreen,
+  LoadFadedScreen
+} from '../../components/LoadFadedScreen'
 import { useDatabase } from '../../services/database'
 import { useArtistTable } from '../../services/database/tables/artists'
 import { useMusicTable } from '../../services/database/tables/music'
 import { IDeezerMusic } from '../../services/deezer'
 import { useHorizontal } from '../../useHorizontal'
 import styles from './styles'
-import {
-  useLoadFadedScreen,
-  LoadFadedScreen
-} from '../../components/LoadFadedScreen'
 
 interface ScreenParams {
   music: IDeezerMusic
@@ -79,7 +79,6 @@ export default function MusicScreen() {
           type: 'danger'
         })
       } else {
-        console.error(e.message)
         showMessage({
           message: 'Erro desconhecido',
           type: 'danger'

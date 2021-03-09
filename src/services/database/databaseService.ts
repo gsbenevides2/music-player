@@ -1,3 +1,4 @@
+import * as DocumentPicker from 'expo-document-picker'
 import * as FileSystem from 'expo-file-system'
 import * as MediaLibrary from 'expo-media-library'
 import * as Permisions from 'expo-permissions'
@@ -13,6 +14,8 @@ import {
   Query
 } from './types'
 
+const fileUri = `${FileSystem.documentDirectory}SQLite/data.db`
+
 export class DatabaseService implements DatabaseServiceImplementation {
   _db = SQLite.openDatabase('data.db')
 
@@ -26,7 +29,6 @@ export class DatabaseService implements DatabaseServiceImplementation {
   async _copyForDev(): Promise<void> {
     if (__DEV__) {
       await Permisions.askAsync(Permisions.CAMERA_ROLL)
-      const fileUri = `${FileSystem.documentDirectory}SQLite/data.db`
       const asset = await MediaLibrary.createAssetAsync(fileUri)
       await MediaLibrary.createAlbumAsync('Download', asset, false)
     }
@@ -72,5 +74,30 @@ export class DatabaseService implements DatabaseServiceImplementation {
     await this.execSQLQuery(musics.createTable())
     await this.execSQLQuery(playlists.createTable())
     await this.execSQLQuery(playlistsMusics.createTable())
+  }
+
+  async deleteDb(): Promise<void> {
+    await FileSystem.deleteAsync(fileUri)
+  }
+
+  async exportDatabase(): Promise<void> {
+    await Permisions.askAsync(Permisions.CAMERA_ROLL)
+    const asset = await MediaLibrary.createAssetAsync(fileUri)
+    await MediaLibrary.createAlbumAsync('Download', asset, false)
+  }
+
+  async importDatabase(): Promise<void> {
+    const result = await DocumentPicker.getDocumentAsync()
+    if (result.type === 'cancel') {
+      throw new Error('t1')
+    } else if (result.type === 'success' && result.name.includes('.db')) {
+      await FileSystem.copyAsync({
+        from: result.uri,
+        to: fileUri
+      })
+      this._db = SQLite.openDatabase('data.db')
+    } else {
+      throw new Error('t2')
+    }
   }
 }

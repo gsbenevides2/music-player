@@ -10,11 +10,13 @@ interface MusicData {
     name: string
     id: string
   }
+  playlistItemId?: number
 }
 interface Methods {
   handleToArtist?: (artistId: string) => void
   removeFromMusicList?: (musicId: string) => void
   addMusicToPlaylist?: (musicId: string) => void
+  removeMusicFromPlaylist?: (playlistItemId: number) => void
   deleteMusic: (musicId: string) => void
 }
 interface Props {
@@ -24,10 +26,13 @@ interface Props {
   methods: Methods
 }
 interface useMusicInfoCallback {
-  visible: boolean
+  props: {
+    visible: boolean
+    close: () => void
+    data: MusicData
+  }
   open: (musicData: MusicData) => void
   close: () => void
-  data: MusicData
 }
 
 export const useMusicInfo = (): useMusicInfoCallback => {
@@ -48,10 +53,13 @@ export const useMusicInfo = (): useMusicInfoCallback => {
     setMusicData(musicData)
   }, [])
   return {
-    visible,
+    props: {
+      visible,
+      close,
+      data: musicData
+    },
     open,
-    close,
-    data: musicData
+    close
   }
 }
 
@@ -71,7 +79,7 @@ const MusicInfo: React.FC<Props> = props => {
             <Button
               onPress={() => {
                 props.close()
-                props.methods.handleToArtist(props.data.artist.id)
+                props.methods.handleToArtist?.(props.data.artist.id)
               }}
             >
               Ver artista
@@ -81,14 +89,24 @@ const MusicInfo: React.FC<Props> = props => {
             <Button
               onPress={() => {
                 props.close()
-                props.methods.addMusicToPlaylist(props.data.artist.id)
+                props.methods.addMusicToPlaylist?.(props.data.artist.id)
               }}
             >
               Adicionar a uma playlist
             </Button>
           ) : undefined}
-          {/*<Button onPress={hideDialog}>Ver foto de capa</Button>
-					<Button onPress={hideDialog}>Baixar</Button>*/}
+          {props.methods.removeMusicFromPlaylist ? (
+            <Button
+              onPress={() => {
+                props.close()
+                props.methods.removeMusicFromPlaylist?.(
+                  props.data.playlistItemId as number
+                )
+              }}
+            >
+              Remover desta playlist
+            </Button>
+          ) : undefined}
           {props.methods.removeFromMusicList ? (
             <Button
               onPress={() => props.methods.removeFromMusicList?.(props.data.id)}

@@ -8,16 +8,20 @@ interface Props {
   setUrl: React.Dispatch<React.SetStateAction<string>>
   visible: boolean
   close: () => void
-  next: () => void
+  next: (url: string) => void
 }
 interface UseUrlInfoReturn {
-  props: Props
+  props: {
+    url: string
+    setUrl: React.Dispatch<React.SetStateAction<string>>
+    visible: boolean
+    close: () => void
+  }
   clear: () => void
   open: () => void
   close: () => void
 }
-type UseUrlInfoCallback = (url: string) => void
-export const useUrlInfo = (callback: UseUrlInfoCallback): UseUrlInfoReturn => {
+export const useUrlInfo = (): UseUrlInfoReturn => {
   const [url, setUrl] = React.useState('')
   const [visible, setVisible] = React.useState(false)
   const close = React.useCallback(() => {
@@ -26,14 +30,10 @@ export const useUrlInfo = (callback: UseUrlInfoCallback): UseUrlInfoReturn => {
   const open = React.useCallback(() => {
     setVisible(true)
   }, [])
-  const next = React.useCallback(() => {
-    callback(url)
-    Keyboard.dismiss()
-  }, [])
   const clear = React.useCallback(() => {
     setUrl('')
   }, [])
-  return { props: { url, setUrl, visible, close, next }, clear, open, close }
+  return { props: { url, setUrl, visible, close }, clear, open, close }
 }
 
 const UrlInfo: React.FC<Props> = props => {
@@ -44,14 +44,22 @@ const UrlInfo: React.FC<Props> = props => {
         <Dialog.Content>
           <TextInput
             value={props.url}
-            onEndEditing={props.next}
+            onEndEditing={() => {
+              props.next(props.url)
+            }}
             onChangeText={text => props.setUrl(text)}
             label="URL do Vídeo"
           />
         </Dialog.Content>
         <Dialog.Actions>
           <Button onPress={props.close}>Sair</Button>
-          <Button onPress={props.next}>Continuar</Button>
+          <Button
+            onPress={() => {
+              props.next(props.url)
+            }}
+          >
+            Continuar
+          </Button>
         </Dialog.Actions>
       </Dialog>
     </Portal>

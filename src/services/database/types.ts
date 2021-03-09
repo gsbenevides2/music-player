@@ -37,5 +37,7 @@ export interface DatabaseServiceImplementation {
   enableForeignKeys(): Promise<unknown>
   // _updateDatabase(from:number, to:number):Promise<void>;
   createTables(): Promise<void>
-  // getMusic(musicId:string):Promise<GetMusicReturns>
+  deleteDb(): Promise<void>
+  exportDatabase(): Promise<void>
+  importDatabase(): Promise<void>
 }

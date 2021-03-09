@@ -1,7 +1,7 @@
 // eslint-disable-next-line no-use-before-define
 import React from 'react'
 import { FlatList, Image } from 'react-native'
-import { List, Button } from 'react-native-paper'
+import { List, IconButton } from 'react-native-paper'
 
 interface Music {
   id: string
@@ -49,14 +49,16 @@ const Item: React.FC<ItemProps> = props => {
       description={music.artist.name}
       left={() => <ImageAlbum url={music.coverUrl} />}
       right={propsIcon =>
-        props.onMore ? (
-          <Button
+        props.onMore
+? (
+          <IconButton
             onPress={onMoreCallback}
             color={propsIcon.color}
-            style={{ ...propsIcon.style, borderRadius: 50 }}
+            style={{ ...propsIcon.style, marginRight: 24 }}
             icon="dots-vertical"
           />
-        ) : undefined
+        )
+: undefined
       }
     />
   )

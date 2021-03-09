@@ -10,14 +10,14 @@ import AllMusicsScreen from './pages/AllMusics'
 import ArtistScreen from './pages/Artist'
 import ArtistsScreen from './pages/Artists'
 import MusicScreen from './pages/Music'
+import NoNetworkScreen from './pages/NoNetwork'
+import OptionsScreen from './pages/Options'
 import PlayerScreen from './pages/Player'
 import PlaylistScreen from './pages/Playlist'
 import PlaylistsScreen from './pages/Playlists'
 import ReproductionListScreen from './pages/ReproductionList'
 import SelectMusicScreen from './pages/SelectMusic'
 import SplashScreen from './pages/Splash'
-import UserScreen from './pages/User'
-
 function TabsRoutes() {
   const Tabs = createMaterialBottomTabNavigator()
   return (
@@ -54,7 +54,7 @@ function TabsRoutes() {
           ),
           title: 'Opções'
         }}
-        component={UserScreen}
+        component={OptionsScreen}
       />
     </Tabs.Navigator>
   )
@@ -71,6 +71,13 @@ const Routes: React.FC = () => {
             headerShown: false
           }}
           component={SplashScreen}
+        />
+        <Stack.Screen
+          name="NoNetworkScreen"
+          options={{
+            headerShown: false
+          }}
+          component={NoNetworkScreen}
         />
         <Stack.Screen
           name="tabs"

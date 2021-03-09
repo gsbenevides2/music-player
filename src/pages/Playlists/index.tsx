@@ -2,7 +2,7 @@
 import React from 'react'
 import { FlatList, View, Image, DeviceEventEmitter } from 'react-native'
 import { showMessage } from 'react-native-flash-message'
-import { List, Title, Subheading, FAB, Button } from 'react-native-paper'
+import { List, Title, Subheading, FAB, IconButton } from 'react-native-paper'
 
 import { useNavigation } from '@react-navigation/native'
 
@@ -40,10 +40,10 @@ const PlaylistItem: React.FC<PlaylistItemProps> = props => {
     props.onPress(id)
   }
   const RightComponent = (iconProps: PropsIcon) => (
-    <Button
+    <IconButton
       onPress={handleDelete}
       color={iconProps.color}
-      style={{ ...iconProps.style, borderRadius: 50 }}
+      style={{ ...iconProps.style, marginRight: 24 }}
       icon="delete"
     />
   )
@@ -74,7 +74,6 @@ const PlaylistsScreen: React.FC = () => {
         }
         const id = await playlistsTable.create(name)
         const newPlaylist = { id, name }
-        console.log('Playlists:', playlists)
         if (playlists) setPlaylists([...playlists, newPlaylist])
         else setPlaylists([newPlaylist])
         showMessage({
@@ -96,6 +95,7 @@ const PlaylistsScreen: React.FC = () => {
   const navigation = useNavigation()
   const handleDeletePlaylist = React.useCallback(
     async (id: number) => {
+      loadedScreen.open()
       try {
         await playlistsTable.delete(id)
         setPlaylists(playlists?.filter(playlist => playlist.id !== id))
@@ -108,6 +108,8 @@ const PlaylistsScreen: React.FC = () => {
           type: 'danger',
           message: 'Erro ao deletar playlist.'
         })
+      } finally {
+        loadedScreen.close()
       }
     },
     [playlists]

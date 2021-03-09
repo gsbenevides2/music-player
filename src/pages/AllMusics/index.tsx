@@ -95,23 +95,35 @@ const AllMusicsScreen: React.FC = () => {
   }, playerListenners)
   const openPlaylitsSelector = React.useCallback(async () => {
     musicInfo.close()
-    const playlists = await plalistTable.list()
-    plalistSelectorModal.setPlaylists(playlists)
-    plalistSelectorModal.open()
+    loadedScreen.open()
+    try {
+      const playlists = await plalistTable.list()
+      plalistSelectorModal.setPlaylists(playlists)
+      plalistSelectorModal.open()
+    } finally {
+      loadedScreen.close()
+    }
   }, [])
   const addMusicToPlaylist = React.useCallback(
     async (playlistId: number) => {
+      loadedScreen.open()
+      plalistSelectorModal.close()
       try {
-        await plalistTable.addToPlalist(playlistId, musicInfo.data.id)
+        await plalistTable.addToPlalist(playlistId, musicInfo.props.data.id)
         showMessage({
           type: 'success',
-          message: 'Adicionado com sucesso'
+          message: 'Adicionado com sucesso!'
+        })
+      } catch (e) {
+        showMessage({
+          type: 'danger',
+          message: 'Erro ao tentar adicionar música a playlist!'
         })
       } finally {
-        plalistSelectorModal.close()
+        loadedScreen.close()
       }
     },
-    [musicInfo.data.id]
+    [musicInfo.props.data.id]
   )
   React.useEffect(() => {
     async function load() {
@@ -141,9 +153,7 @@ const AllMusicsScreen: React.FC = () => {
         />
         <LoadFadedScreen {...loadedScreen.props} />
         <MusicInfo
-          visible={musicInfo.visible}
-          close={musicInfo.close}
-          data={musicInfo.data}
+          {...musicInfo.props}
           methods={{
             deleteMusic,
             handleToArtist,

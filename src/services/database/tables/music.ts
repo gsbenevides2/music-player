@@ -136,7 +136,6 @@ export function useMusicTable(database: DatabaseService): UseMusicTableReturn {
       youtubeId: string,
       artistId: string
     ): Promise<void> {
-      console.log(name)
       await database.execSQLQuery({
         sql: [
           'INSERT INTO musics (id, name, coverUrl, youtubeId, artistId)',

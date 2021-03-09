@@ -4,6 +4,7 @@ import { PlayerContext } from '..'
 
 import { YoutubeService } from '../../../services/youtube'
 import { LoadedUsecontext } from '../types'
+import { clearData } from './clearData'
 import { pauseMusic } from './pauseMusic'
 import { playMusic } from './playMusic'
 import { playNext } from './playNext'
@@ -38,6 +39,7 @@ export function usePlayerContext(): LoadedUsecontext {
       playerContext,
       youtubeService
     ),
+    clearData: clearData(playerContext),
     ...playerContext?.playerState
   }
 }

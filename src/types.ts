@@ -15,3 +15,7 @@ export interface IPlaylist {
   id: number
   name: string
 }
+export interface IMusicInPlaylist extends IMusic {
+  position: number
+  playlistItemId: number
+}

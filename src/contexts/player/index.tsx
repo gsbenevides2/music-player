@@ -5,13 +5,9 @@ import AsyncStorage from '@react-native-async-storage/async-storage'
 import { Audio } from 'expo-av'
 
 import { YoutubeService } from '../../services/youtube'
-import { ContextType, PlayerState } from './types'
+import { ContextType, PlayerState, AsyncStoragePlayerState } from './types'
 
 export const PlayerContext = React.createContext<ContextType>(undefined)
-
-interface AsyncStoragePlayerState extends PlayerState {
-  sound: undefined
-}
 
 export const PlayerProvider: React.FC = ({ children }) => {
   Audio.setAudioModeAsync({
@@ -27,29 +23,49 @@ export const PlayerProvider: React.FC = ({ children }) => {
     timeDataFrom: 0
   })
   React.useEffect(() => {
-    AsyncStorage.getItem('playerContext').then(async value => {
-      if (value) {
-        const newPlayerState = JSON.parse(value) as AsyncStoragePlayerState
-        if (newPlayerState.musicActualy) {
-          const youtubeService = new YoutubeService()
-          const musicUrl = await youtubeService.getMusicPlayUrl(
-            newPlayerState.musicActualy.youtubeId
-          )
-          await sound.loadAsync(
-            {
-              uri: musicUrl
-            },
-            {
-              positionMillis: newPlayerState.timeDataFrom
-            }
-          )
-          setPlayerState({
-            ...newPlayerState,
-            sound
-          })
+    AsyncStorage.getItem('playerContext')
+      .then(async value => {
+        if (value) {
+          const newPlayerState = JSON.parse(value) as AsyncStoragePlayerState
+          if (newPlayerState.musicActualy) {
+            const youtubeService = new YoutubeService()
+            const musicUrl = await youtubeService.getMusicPlayUrl(
+              newPlayerState.musicActualy.youtubeId
+            )
+            await sound.loadAsync(
+              {
+                uri: musicUrl
+              },
+              {
+                positionMillis: newPlayerState.timeDataFrom
+              }
+            )
+            setPlayerState({
+              ...newPlayerState,
+              sound
+            })
+          } else {
+            setPlayerState({
+              musicList: [],
+              sound,
+              isShuffle: false,
+              isRepeat: false,
+              timeDataTo: 0,
+              timeDataFrom: 0
+            })
+          }
         }
-      }
-    })
+      })
+      .catch(() => {
+        setPlayerState({
+          musicList: [],
+          sound,
+          isShuffle: false,
+          isRepeat: false,
+          timeDataTo: 0,
+          timeDataFrom: 0
+        })
+      })
   }, [])
   React.useEffect(() => {
     const serializedPlayerState = { ...playerState, sound: undefined }

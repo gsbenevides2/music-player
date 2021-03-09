@@ -1,4 +1,5 @@
 import { Sound } from 'expo-av/build/Audio'
+import * as Network from 'expo-network'
 
 import { YoutubeService } from '../../../services/youtube'
 import { nextMusic } from '../../../utils/nextMusic'
@@ -9,6 +10,10 @@ export const removeMusicFromMusicList = (
   youtubeService: YoutubeService
 ) => {
   return async (musicId: string): Promise<void> => {
+    const networkState = await Network.getNetworkStateAsync()
+    if (!networkState.isInternetReachable) {
+      throw new Error('t1')
+    }
     if (playerContext?.playerState === undefined) return
     const sound = playerContext?.playerState.sound as Sound
     const actualIndex = playerContext.playerState.musicList.findIndex(

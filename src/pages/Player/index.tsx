@@ -3,24 +3,25 @@ import React from 'react'
 import { View } from 'react-native'
 
 import { useNavigation } from '@react-navigation/native'
+import { AVPlaybackStatus } from 'expo-av'
 
 import { getPlayerListenners } from '../../contexts/player/listenners'
 import { usePlayerContext } from '../../contexts/player/use'
 import { useHorizontal } from '../../useHorizontal'
+import { onNetworkUpdatesInPlayer } from '../NoNetwork'
 import { AlbumImageMemorized } from './components/AlbumImage'
 import { MusicDataMemorized } from './components/MusicData'
 import { MusicProgressBarMemorized } from './components/MusicProgressBar'
 import { PlayerButtonsMemorized } from './components/PlayerButtons'
 import { PlayerOptionsMemorized } from './components/PlayerOptions'
 import styles from './styles'
-import { red50 } from 'react-native-paper/lib/typescript/styles/colors'
-import { AVPlaybackStatus } from 'expo-av'
 
 // eslint-disable-next-line @typescript-eslint/explicit-module-boundary-types
 export default function PlayerScreen() {
   const navigation = useNavigation()
   const player = usePlayerContext()
   const horizontal = useHorizontal()
+  onNetworkUpdatesInPlayer()
   const playerListennersData = getPlayerListenners(player)
   const [isPlaying, setIsPlaying] = React.useState(false)
 
@@ -112,8 +113,8 @@ export default function PlayerScreen() {
 }
 
 /*
- * Old Code for future implementation
+	* Old Code for future implementation
 import MusicInfo, { useMusicInfo } from '../../modals/MusicInfo'
-  const musicInfo = useMusicInfo()
+		const musicInfo = useMusicInfo()
 					<MusicInfo visible={musicInfo.visible} close={musicInfo.close} />
- */
+	*/

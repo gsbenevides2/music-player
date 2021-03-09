@@ -7,6 +7,7 @@ export default StyleSheet.create({
     fontSize: 22
   },
   artistName: {
-    fontSize: 20
+    fontSize: 20,
+    textAlign: 'center'
   }
 })
