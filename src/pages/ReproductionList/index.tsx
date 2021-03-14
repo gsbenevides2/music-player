@@ -6,18 +6,12 @@ import { Title, Subheading } from 'react-native-paper'
 
 import { useNavigation } from '@react-navigation/native'
 
-import {
-  useLoadFadedScreen,
-  LoadFadedScreen
-} from '../../components/LoadFadedScreen'
+import { useLoadFadedScreen } from '../../components/LoadFadedScreen'
 import MusicListDrag from '../../components/MusicListDrag'
 import { getPlayerListenners } from '../../contexts/player/listenners'
 import { usePlayerContext } from '../../contexts/player/use'
 import MusicInfo, { useMusicInfo } from '../../modals/MusicInfo'
-import {
-  SelectPlaylistModal,
-  useSelectPlaylistModal
-} from '../../modals/SelectPlalist'
+import { useSelectPlaylistModal } from '../../modals/SelectPlalist'
 import { useDatabase } from '../../services/database'
 import { useMusicTable } from '../../services/database/tables/music'
 import { usePlaylistsTable } from '../../services/database/tables/playlists'
@@ -43,11 +37,11 @@ export default function HomeScreen(): React.ReactElement {
   const player = usePlayerContext()
   const playerListenners = getPlayerListenners(player)
   const musicInfo = useMusicInfo()
-  const plalistSelectorModal = useSelectPlaylistModal()
+  const playlistSelectorModal = useSelectPlaylistModal()
 
   const deleteMusic = React.useCallback(async (musicId: string) => {
     musicInfo.close()
-    loadedScreen.open()
+    loadedScreen?.open()
     try {
       await musicTable.delete(musicId)
       await player.removeMusicFromMusicList(musicId)
@@ -61,7 +55,7 @@ export default function HomeScreen(): React.ReactElement {
         type: 'danger'
       })
     } finally {
-      loadedScreen.close()
+      loadedScreen?.close()
     }
   }, playerListenners)
   const handleToArtist = React.useCallback((artistId: string) => {
@@ -69,11 +63,11 @@ export default function HomeScreen(): React.ReactElement {
   }, [])
   const removeFromMusicList = React.useCallback(async (musicId: string) => {
     musicInfo.close()
-    loadedScreen.open()
+    loadedScreen?.open()
     try {
       await player.removeMusicFromMusicList(musicId)
     } finally {
-      loadedScreen.close()
+      loadedScreen?.close()
     }
   }, playerListenners)
   const onMoreCallback = React.useCallback(async (musicId: string) => {
@@ -93,7 +87,7 @@ export default function HomeScreen(): React.ReactElement {
     player.setMusicList(musics)
   }, playerListenners)
   const musicPressCallback = React.useCallback(async (musicId: string) => {
-    loadedScreen.open()
+    loadedScreen?.open()
     try {
       if (player.musicList) {
         const musicIndex = player.musicList.findIndex(
@@ -102,41 +96,31 @@ export default function HomeScreen(): React.ReactElement {
         await player.startPlaylist(player.musicList, musicIndex)
       }
     } finally {
-      loadedScreen.close()
+      loadedScreen?.close()
     }
   }, playerListenners)
   const openPlaylitsSelector = React.useCallback(async () => {
     musicInfo.close()
-    loadedScreen.open()
+    loadedScreen?.open()
     try {
       const playlists = await plalistTable.list()
-      plalistSelectorModal.setPlaylists(playlists)
-      plalistSelectorModal.open()
+      const playlistId = await playlistSelectorModal?.(playlists)
+      if (!playlistId) return
+      loadedScreen?.open()
+      await plalistTable.addToPlalist(playlistId, musicInfo.props.data.id)
+      showMessage({
+        type: 'success',
+        message: 'Adicionado com sucesso!'
+      })
+    } catch (e) {
+      showMessage({
+        type: 'danger',
+        message: 'Erro ao tentar adicionar música a playlist!'
+      })
     } finally {
-      loadedScreen.close()
+      loadedScreen?.close()
     }
-  }, [])
-  const addMusicToPlaylist = React.useCallback(
-    async (playlistId: number) => {
-      loadedScreen.open()
-      plalistSelectorModal.close()
-      try {
-        await plalistTable.addToPlalist(playlistId, musicInfo.props.data.id)
-        showMessage({
-          type: 'success',
-          message: 'Adicionado com sucesso!'
-        })
-      } catch (e) {
-        showMessage({
-          type: 'danger',
-          message: 'Erro ao tentar adicionar música a playlist!'
-        })
-      } finally {
-        loadedScreen.close()
-      }
-    },
-    [musicInfo.props.data.id]
-  )
+  }, [musicInfo.props.data.id])
 
   if (player.musicList && player.musicList.length) {
     return (
@@ -147,7 +131,6 @@ export default function HomeScreen(): React.ReactElement {
           onPress={musicPressCallback}
           onMore={onMoreCallback}
         />
-        <LoadFadedScreen {...loadedScreen.props} />
         <MusicInfo
           {...musicInfo.props}
           methods={{
@@ -156,10 +139,6 @@ export default function HomeScreen(): React.ReactElement {
             handleToArtist,
             addMusicToPlaylist: openPlaylitsSelector
           }}
-        />
-        <SelectPlaylistModal
-          {...plalistSelectorModal.props}
-          next={addMusicToPlaylist}
         />
       </View>
     )

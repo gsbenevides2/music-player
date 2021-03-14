@@ -1,5 +1,5 @@
+import NetInfo from '@react-native-community/netinfo'
 import { Sound } from 'expo-av/build/Audio'
-import * as Network from 'expo-network'
 
 import { YoutubeService } from '../../../services/youtube'
 import { ContextType } from '../types'
@@ -9,7 +9,7 @@ export const playPrevious = (
   youtubeService: YoutubeService
 ) => {
   return async (): Promise<void> => {
-    const networkState = await Network.getNetworkStateAsync()
+    const networkState = await NetInfo.fetch()
     if (!networkState.isInternetReachable) {
       throw new Error('t1')
     }

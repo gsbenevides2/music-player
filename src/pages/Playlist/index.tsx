@@ -6,10 +6,7 @@ import { Title, Subheading, IconButton } from 'react-native-paper'
 
 import { useRoute, useNavigation } from '@react-navigation/native'
 
-import {
-  LoadFadedScreen,
-  useLoadFadedScreen
-} from '../../components/LoadFadedScreen'
+import { useLoadFadedScreen } from '../../components/LoadFadedScreen'
 import MusicListDrag from '../../components/MusicListDrag'
 import { getPlayerListenners } from '../../contexts/player/listenners'
 import { usePlayerContext } from '../../contexts/player/use'
@@ -39,7 +36,7 @@ const PlaylistScreen: React.FC = () => {
   const deleteMusic = React.useCallback(
     async (musicId: string) => {
       musicInfo.close()
-      loadedScreen.open()
+      loadedScreen?.open()
       try {
         await musicTable.delete(musicId)
         await player.removeMusicFromMusicList(musicId)
@@ -63,7 +60,7 @@ const PlaylistScreen: React.FC = () => {
           type: 'danger'
         })
       } finally {
-        loadedScreen.close()
+        loadedScreen?.close()
       }
     },
     [...playerListenners, musics]
@@ -91,21 +88,21 @@ const PlaylistScreen: React.FC = () => {
   )
   const musicPressCallback = React.useCallback(
     async (musicId: string) => {
-      loadedScreen.open()
+      loadedScreen?.open()
       try {
         const musicIndex = musics?.findIndex(
           music => music.id === musicId
         ) as number
         await player.startPlaylist(musics as IMusicInPlaylist[], musicIndex)
       } finally {
-        loadedScreen.close()
+        loadedScreen?.close()
       }
     },
     [...playerListenners, musics]
   )
   const handleToRemoveMusicFromPlaylist = React.useCallback(
     async (playlistItemId: number) => {
-      loadedScreen.open()
+      loadedScreen?.open()
       try {
         await playlistsTable.removeFromPlaylist(playlistItemId)
         const newPlaylist = musics
@@ -128,14 +125,14 @@ const PlaylistScreen: React.FC = () => {
           message: 'Erro ao tentar remover música da playlist!'
         })
       } finally {
-        loadedScreen.close()
+        loadedScreen?.close()
       }
     },
     [musics]
   )
   const handleToUpdatePlaylistMusicPositions = React.useCallback(
     async (newPlaylistToReorder: IMusicInPlaylist[]) => {
-      loadedScreen.open()
+      loadedScreen?.open()
       try {
         const newPlaylist = newPlaylistToReorder.map((music, index) => {
           return {
@@ -146,14 +143,14 @@ const PlaylistScreen: React.FC = () => {
         setMusics(newPlaylist)
         await playlistsTable.updatePositions(newPlaylist)
       } finally {
-        loadedScreen.close()
+        loadedScreen?.close()
       }
     },
     []
   )
 
   const deletePlaylist = React.useCallback(async () => {
-    loadedScreen.open()
+    loadedScreen?.open()
     try {
       await playlistsTable.delete(playlistId)
       navigation.goBack()
@@ -168,7 +165,7 @@ const PlaylistScreen: React.FC = () => {
         message: 'Erro ao tentar deletar a playlist!'
       })
     } finally {
-      loadedScreen.close()
+      loadedScreen?.close()
     }
   }, [])
   React.useEffect(() => {
@@ -224,7 +221,6 @@ const PlaylistScreen: React.FC = () => {
             removeMusicFromPlaylist: handleToRemoveMusicFromPlaylist
           }}
         />
-        <LoadFadedScreen {...loadedScreen.props} />
       </View>
     )
   }

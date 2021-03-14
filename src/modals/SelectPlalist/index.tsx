@@ -5,59 +5,77 @@ import { List, Portal, Dialog } from 'react-native-paper'
 
 import { IPlaylist } from '../../types'
 
-interface Props {
+interface ContextState {
   visible: boolean
-  close: () => void
-  next: (id: number) => void
+  next?: (id: number) => void
   playlists: IPlaylist[]
 }
-interface UseSelectPlaylistModalReturn {
-  props: {
-    visible: boolean
-    close: () => void
-    playlists: IPlaylist[]
-  }
-  close: () => void
-  open: () => void
-  setPlaylists: React.Dispatch<React.SetStateAction<IPlaylist[]>>
-}
-export function useSelectPlaylistModal(): UseSelectPlaylistModalReturn {
-  const [playlists, setPlaylists] = React.useState<IPlaylist[]>([])
-  const [visible, setVisible] = React.useState(false)
-  const close = React.useCallback(() => {
-    setVisible(false)
-  }, [])
-  const open = React.useCallback(() => {
-    setVisible(true)
-  }, [])
-  return {
-    props: {
-      close,
-      playlists,
-      visible
-    },
-    close,
-    open,
-    setPlaylists
-  }
+
+interface ContextType {
+  state: ContextState
+  setState: React.Dispatch<React.SetStateAction<ContextState>>
 }
 
-export const SelectPlaylistModal: React.FC<Props> = props => {
+const Context = React.createContext<ContextType | undefined>(undefined)
+
+export const SelectPlaylistModalProvider: React.FC = ({ children }) => {
+  const [state, setState] = React.useState<ContextState>({
+    visible: false,
+    playlists: []
+  })
+  const close = React.useCallback(() => {
+    setState({
+      visible: false,
+      playlists: []
+    })
+  }, [])
+  const next = React.useCallback(
+    (id: number) => {
+      state.next?.(id)
+      close()
+    },
+    [state.next]
+  )
   const Item = ({ item }: { item: IPlaylist }) => (
-    <List.Item onPress={() => props.next(item.id)} title={item.name} />
+    <List.Item onPress={() => next(item.id)} title={item.name} />
   )
   return (
-    <Portal>
-      <Dialog visible={props.visible} onDismiss={props.close}>
-        <Dialog.Title>Selecione uma plalist</Dialog.Title>
-        <Dialog.Content>
-          <FlatList
-            data={props.playlists}
-            renderItem={Item}
-            keyExtractor={item => item.id.toString()}
-          />
-        </Dialog.Content>
-      </Dialog>
-    </Portal>
+    <Context.Provider value={{ state, setState }}>
+      {children}
+      <Portal>
+        <Dialog visible={state.visible} onDismiss={close}>
+          <Dialog.Title>Selecione uma plalist</Dialog.Title>
+          <Dialog.Content>
+            <FlatList
+              data={state.playlists}
+              renderItem={Item}
+              keyExtractor={item => item.id.toString()}
+            />
+          </Dialog.Content>
+        </Dialog>
+      </Portal>
+    </Context.Provider>
   )
+}
+
+type UseSelectPlaylistModalReturn = (playlists: IPlaylist[]) => Promise<number>
+
+export function useSelectPlaylistModal():
+  | UseSelectPlaylistModalReturn
+  | undefined {
+  const context = React.useContext(Context)
+
+  if (context) {
+    return playlists => {
+      return new Promise(resolve => {
+        context.setState({
+          playlists,
+          visible: true,
+          next: id => {
+            resolve(id)
+          }
+        })
+      })
+    }
+  }
 }

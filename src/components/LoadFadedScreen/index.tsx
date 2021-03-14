@@ -1,29 +1,43 @@
+// eslint-disable-next-line no-use-before-define
 import React from 'react'
-import {
- ActivityIndicator,
- Portal,
- Modal
-} from 'react-native-paper'
+import { ActivityIndicator, Portal, Modal } from 'react-native-paper'
 
-interface LoadFadedScreenProps {
- open:boolean
+interface ContextType {
+  state: boolean
+  setState: React.Dispatch<React.SetStateAction<boolean>>
 }
 
+const Context = React.createContext<ContextType | undefined>(undefined)
 
-export const LoadFadedScreen:React.FC<LoadFadedScreenProps> = ({open})=>(
- <Portal>
-	<Modal visible={open} dismissable={false}>
-	 <ActivityIndicator size='large'/>
-	</Modal>
- </Portal>
-)
+export const LoadFadedScreenProvider: React.FC = ({ children }) => {
+  const [state, setState] = React.useState(false)
 
-export function useLoadFadedScreen(){
- const [open,setOpen] = React.useState(false)
- return {
-	open:()=>setOpen(true),
-	close:()=>setOpen(false),
-	props:{open}
- } 
+  return (
+    <Context.Provider value={{ state, setState }}>
+      {children}
+      <Portal>
+        <Modal visible={state} dismissable={false}>
+          <ActivityIndicator size="large" />
+        </Modal>
+      </Portal>
+    </Context.Provider>
+  )
 }
 
+interface UseLoadFadedScreen {
+  open: () => void
+  close: () => void
+}
+export function useLoadFadedScreen(): UseLoadFadedScreen | undefined {
+  const context = React.useContext(Context)
+  if (context) {
+    return {
+      open() {
+        context.setState(true)
+      },
+      close() {
+        context.setState(false)
+      }
+    }
+  }
+}

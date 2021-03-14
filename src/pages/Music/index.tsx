@@ -11,10 +11,7 @@ import { Title, Paragraph, FAB } from 'react-native-paper'
 
 import { useNavigation, useRoute, StackActions } from '@react-navigation/native'
 
-import {
-  useLoadFadedScreen,
-  LoadFadedScreen
-} from '../../components/LoadFadedScreen'
+import { useLoadFadedScreen } from '../../components/LoadFadedScreen'
 import { useDatabase } from '../../services/database'
 import { useArtistTable } from '../../services/database/tables/artists'
 import { useMusicTable } from '../../services/database/tables/music'
@@ -39,7 +36,7 @@ export default function MusicScreen() {
   const loadedScreen = useLoadFadedScreen()
   const addMusicToDatabase = React.useCallback(async () => {
     try {
-      loadedScreen.open()
+      loadedScreen?.open()
       async function checkMusicAlreadyExists(): Promise<void> {
         const music =
           (await musicTable.get(routeParams.music.id)) ||
@@ -69,10 +66,10 @@ export default function MusicScreen() {
         message: 'Música adicionada com sucesso',
         type: 'success'
       })
-      loadedScreen.close()
+      loadedScreen?.close()
       DeviceEventEmitter.emit('update-artists')
     } catch (e) {
-      loadedScreen.close()
+      loadedScreen?.close()
       if (e.message === 'Code:01') {
         showMessage({
           message: 'Ops essa música ja esta na sua biblioteca',
@@ -108,7 +105,6 @@ export default function MusicScreen() {
         <Paragraph>YouTube Video ID: {routeParams.youtubeId}</Paragraph>
       </View>
       <FAB style={styles.fab} icon="plus" onPress={addMusicToDatabase} />
-      <LoadFadedScreen {...loadedScreen.props} />
     </View>
   )
 }

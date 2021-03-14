@@ -5,10 +5,7 @@ import { TextInput, Title, Subheading } from 'react-native-paper'
 
 import { useRoute, useNavigation } from '@react-navigation/native'
 
-import {
-  LoadFadedScreen,
-  useLoadFadedScreen
-} from '../../components/LoadFadedScreen'
+import { useLoadFadedScreen } from '../../components/LoadFadedScreen'
 import MusicList from '../../components/MusicList'
 import {
   DeezerService,
@@ -65,12 +62,12 @@ const SelectMusicScreen: React.FC = () => {
 
   const endOfList = React.useCallback(async () => {
     if (deezerData.next) {
-      loadedScreen.open()
+      loadedScreen?.open()
       const resultForDeezer = await deezerService.searchMusicNext(
         inputSearch,
         deezerData.next
       )
-      loadedScreen.close()
+      loadedScreen?.close()
       setDeezerData({
         next: resultForDeezer.next,
         musics: removeDuplicatedMusicsAndConcat(
@@ -107,13 +104,14 @@ const SelectMusicScreen: React.FC = () => {
           onEndReached={endOfList}
         />
         {!deezerData.musics.length && <NoMusic />}
-        {!deezerData.next && deezerData.musics.length ? (
+        {!deezerData.next && deezerData.musics.length
+? (
           <Title style={{ alignSelf: 'center', flex: 1 }}>
             Fim Dos Resultados
           </Title>
-        ) : null}
+        )
+: null}
       </View>
-      <LoadFadedScreen {...loadedScreen.props} />
     </View>
   )
 }

@@ -1,5 +1,5 @@
+import NetInfo from '@react-native-community/netinfo'
 import { Sound } from 'expo-av/build/Audio'
-import * as Network from 'expo-network'
 
 import { YoutubeService } from '../../../services/youtube'
 import { nextMusic } from '../../../utils/nextMusic'
@@ -10,7 +10,7 @@ export const removeMusicFromMusicList = (
   youtubeService: YoutubeService
 ) => {
   return async (musicId: string): Promise<void> => {
-    const networkState = await Network.getNetworkStateAsync()
+    const networkState = await NetInfo.fetch()
     if (!networkState.isInternetReachable) {
       throw new Error('t1')
     }

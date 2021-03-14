@@ -6,11 +6,8 @@ import { List, Title, Subheading, FAB, IconButton } from 'react-native-paper'
 
 import { useNavigation } from '@react-navigation/native'
 
-import {
-  useLoadFadedScreen,
-  LoadFadedScreen
-} from '../../components/LoadFadedScreen'
-import PlaylistName, { usePlaylistName } from '../../modals/PlaylistName'
+import { useLoadFadedScreen } from '../../components/LoadFadedScreen'
+import { useInputModal } from '../../modals/Input'
 import { useDatabase } from '../../services/database'
 import { usePlaylistsTable } from '../../services/database/tables/playlists'
 
@@ -62,40 +59,53 @@ const PlaylistsScreen: React.FC = () => {
   const database = useDatabase()
   const loadedScreen = useLoadFadedScreen()
   const playlistsTable = usePlaylistsTable(database)
-  const createNewPlaylist = React.useCallback(
-    async (name: string) => {
-      loadedScreen.open()
-      try {
-        if (!name || !name.length) {
-          return showMessage({
-            message: 'Digite um nome valido.',
+  const inputModal = useInputModal()
+  const handleToOpenModal = React.useCallback(() => {
+    inputModal
+      ?.open({
+        name: 'Criar uma playlist',
+        label: 'Inisira o nome da playlist:'
+      })
+      .then(async name => {
+        loadedScreen?.open()
+        try {
+          if (!name || !name.length) {
+            return showMessage({
+              message: 'Digite um nome valido.',
+              type: 'danger'
+            })
+          }
+          const id = await playlistsTable.create(name)
+          const newPlaylist = { id, name }
+          if (playlists) setPlaylists([...playlists, newPlaylist])
+          else setPlaylists([newPlaylist])
+          showMessage({
+            message: 'Playlist criada com sucesso',
+            type: 'success'
+          })
+        } catch (e) {
+          showMessage({
+            message: 'Ocorreu um erro.',
             type: 'danger'
           })
+        } finally {
+          loadedScreen?.close()
+          inputModal.close()
         }
-        const id = await playlistsTable.create(name)
-        const newPlaylist = { id, name }
-        if (playlists) setPlaylists([...playlists, newPlaylist])
-        else setPlaylists([newPlaylist])
-        showMessage({
-          message: 'Playlist criada com sucesso',
-          type: 'success'
-        })
-      } catch (e) {
+      })
+      .catch(() => {
         showMessage({
           message: 'Ocorreu um erro.',
           type: 'danger'
         })
-      } finally {
-        loadedScreen.close()
-      }
-    },
-    [playlists]
-  )
-  const playlistName = usePlaylistName()
+        loadedScreen?.close()
+        inputModal.close()
+      })
+  }, [playlists])
   const navigation = useNavigation()
   const handleDeletePlaylist = React.useCallback(
     async (id: number) => {
-      loadedScreen.open()
+      loadedScreen?.open()
       try {
         await playlistsTable.delete(id)
         setPlaylists(playlists?.filter(playlist => playlist.id !== id))
@@ -109,7 +119,7 @@ const PlaylistsScreen: React.FC = () => {
           message: 'Erro ao deletar playlist.'
         })
       } finally {
-        loadedScreen.close()
+        loadedScreen?.close()
       }
     },
     [playlists]
@@ -146,12 +156,6 @@ const PlaylistsScreen: React.FC = () => {
           <Title>Você ainda não tem playlists</Title>
           <Subheading>Clique no + e crie uma!</Subheading>
         </View>
-        <LoadFadedScreen {...loadedScreen.props} />
-        <PlaylistName
-          visible={playlistName.visible}
-          next={createNewPlaylist}
-          close={playlistName.close}
-        />
         <FAB
           style={{
             position: 'absolute',
@@ -160,7 +164,7 @@ const PlaylistsScreen: React.FC = () => {
             bottom: 0
           }}
           icon="plus"
-          onPress={playlistName.open}
+          onPress={handleToOpenModal}
         />
       </View>
     )
@@ -178,12 +182,6 @@ const PlaylistsScreen: React.FC = () => {
             />
           )}
         />
-        <LoadFadedScreen {...loadedScreen.props} />
-        <PlaylistName
-          visible={playlistName.visible}
-          next={createNewPlaylist}
-          close={playlistName.close}
-        />
         <FAB
           style={{
             position: 'absolute',
@@ -192,7 +190,7 @@ const PlaylistsScreen: React.FC = () => {
             bottom: 0
           }}
           icon="plus"
-          onPress={playlistName.open}
+          onPress={handleToOpenModal}
         />
       </View>
     )

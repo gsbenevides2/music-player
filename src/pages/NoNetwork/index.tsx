@@ -3,40 +3,38 @@ import React from 'react'
 import { View, Image } from 'react-native'
 import { Subheading, Title } from 'react-native-paper'
 
+import NetInfo from '@react-native-community/netinfo'
 import { useNavigation } from '@react-navigation/native'
-import { getNetworkStateAsync } from 'expo-network'
 
 export function onNetworkUpdatesInPlayer(): void {
   const navigation = useNavigation()
   React.useEffect(() => {
-    const interval = setInterval(async () => {
-      const { isInternetReachable } = await getNetworkStateAsync()
+    const unsubscribe = NetInfo.addEventListener(({ isInternetReachable }) => {
       if (!isInternetReachable) {
         navigation.reset({
           index: 0,
           routes: [{ name: 'NoNetworkScreen' }]
         })
       }
-    }, 2000)
+    })
     return () => {
-      clearInterval(interval)
+      unsubscribe()
     }
   }, [])
 }
 export function onNetworkUpdatesInNoNetwork(): void {
   const navigation = useNavigation()
   React.useEffect(() => {
-    const interval = setInterval(async () => {
-      const { isInternetReachable } = await getNetworkStateAsync()
+    const unsubscribe = NetInfo.addEventListener(({ isInternetReachable }) => {
       if (isInternetReachable) {
         navigation.reset({
           index: 0,
           routes: [{ name: 'tabs' }]
         })
       }
-    }, 2000)
+    })
     return () => {
-      clearInterval(interval)
+      unsubscribe()
     }
   }, [])
 }

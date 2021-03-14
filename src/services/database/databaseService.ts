@@ -14,10 +14,11 @@ import {
   Query
 } from './types'
 
-const fileUri = `${FileSystem.documentDirectory}SQLite/data.db`
+const dbName = 'data.db'
+const fileUri = `${FileSystem.documentDirectory}SQLite/${dbName}`
 
 export class DatabaseService implements DatabaseServiceImplementation {
-  _db = SQLite.openDatabase('data.db')
+  _db = SQLite.openDatabase(dbName)
 
   _parseQuery(query: Query): SQLite.Query {
     return {
@@ -95,7 +96,7 @@ export class DatabaseService implements DatabaseServiceImplementation {
         from: result.uri,
         to: fileUri
       })
-      this._db = SQLite.openDatabase('data.db')
+      this._db = SQLite.openDatabase(dbName)
     } else {
       throw new Error('t2')
     }

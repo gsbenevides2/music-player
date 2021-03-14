@@ -8,13 +8,11 @@ import AsyncStorage from '@react-native-async-storage/async-storage'
 import { useNavigation } from '@react-navigation/native'
 import * as WebBrowser from 'expo-web-browser'
 
-import {
-  LoadFadedScreen,
-  useLoadFadedScreen
-} from '../../components/LoadFadedScreen'
+import { useLoadFadedScreen } from '../../components/LoadFadedScreen'
 import { getPlayerListenners } from '../../contexts/player/listenners'
 import { usePlayerContext } from '../../contexts/player/use'
-import UrlInfo, { useUrlInfo } from '../../modals/UrlInfo'
+import { useConfirmModal } from '../../modals/Confirm'
+import { useInputModal } from '../../modals/Input'
 import { useDatabase } from '../../services/database'
 import { DeezerService } from '../../services/deezer'
 import { YoutubeService } from '../../services/youtube'
@@ -28,33 +26,44 @@ const OptionsScreen: React.FC = () => {
   const loadedScreen = useLoadFadedScreen()
   const player = usePlayerContext()
   const playerListenners = getPlayerListenners(player)
-  const urlInfo = useUrlInfo()
-  const handleUrlInfo = React.useCallback(
-    async (url: string) => {
-      Keyboard.dismiss()
-      loadedScreen.open()
-      try {
-        const resultForYoutube = await youtubeService.getVideoIdAndTitle(url)
-        const resultForDeezer = await deezerService.searchMusic(
-          resultForYoutube.generatedMusicName
-        )
-        loadedScreen.close()
-        navigation.navigate('SelectMusic', {
-          resultForDeezer,
-          resultForYoutube
-        })
-        urlInfo.close()
-        urlInfo.clear()
-      } catch (e) {
+  const inputModal = useInputModal()
+  const confirmModal = useConfirmModal()
+
+  const handleToOpenModal = React.useCallback(() => {
+    inputModal
+      ?.open({ name: 'Adicionar música', label: 'Insira um link:' })
+      .then(async url => {
+        Keyboard.dismiss()
+        loadedScreen?.open()
+        try {
+          const resultForYoutube = await youtubeService.getVideoIdAndTitle(url)
+          const resultForDeezer = await deezerService.searchMusic(
+            resultForYoutube.generatedMusicName
+          )
+          loadedScreen?.close()
+          navigation.navigate('SelectMusic', {
+            resultForDeezer,
+            resultForYoutube
+          })
+          inputModal.close()
+          // urlInfo.clear()
+        } catch (e) {
+          showMessage({
+            message: 'Ocorreu um erro, verifique a url',
+            type: 'danger'
+          })
+          loadedScreen?.close()
+        }
+      })
+      .catch(() => {
         showMessage({
-          message: 'Ocorreu um erro, verifique a url',
+          message: 'Ocorreu um erro.',
           type: 'danger'
         })
-        loadedScreen.close()
-      }
-    },
-    [urlInfo.props.url]
-  )
+        loadedScreen?.close()
+        inputModal.close()
+      })
+  }, [])
 
   const handleToAllMusics = React.useCallback(() => {
     navigation.navigate('AllMusics')
@@ -63,6 +72,13 @@ const OptionsScreen: React.FC = () => {
     navigation.navigate('Playlists')
   }, [])
   const handleToResetApp = React.useCallback(async () => {
+    const result = await confirmModal?.('Deseja realmente deletar tudo?')
+    if (!result) {
+      return showMessage({
+        type: 'success',
+        message: 'Operação cancelada!'
+      })
+    }
     await player.clearData()
     await database.deleteDb()
     await AsyncStorage.clear()
@@ -119,7 +135,7 @@ const OptionsScreen: React.FC = () => {
     <ScrollView style={styles.container}>
       <Text style={styles.title}>Olá, tudo bem?</Text>
       <List.Item
-        onPress={urlInfo.open}
+        onPress={handleToOpenModal}
         title="Adicionar Música"
         description="Adicione uma música a sua coleção."
         left={props => <List.Icon {...props} icon="plus" />}
@@ -160,8 +176,6 @@ const OptionsScreen: React.FC = () => {
         description="Sobre, Codigo-Aberto, Contato"
         left={props => <List.Icon {...props} icon="information" />}
       />
-      <UrlInfo {...urlInfo.props} next={handleUrlInfo} />
-      <LoadFadedScreen {...loadedScreen.props} />
     </ScrollView>
   )
 }
