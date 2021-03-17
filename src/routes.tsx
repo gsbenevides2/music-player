@@ -15,6 +15,7 @@ import OptionsScreen from './pages/Options'
 import PlayerScreen from './pages/Player'
 import PlaylistScreen from './pages/Playlist'
 import PlaylistsScreen from './pages/Playlists'
+import { QRCodeShareScreen } from './pages/QRCodeShare'
 import ReproductionListScreen from './pages/ReproductionList'
 import SelectMusicScreen from './pages/SelectMusic'
 import SplashScreen from './pages/Splash'
@@ -126,6 +127,11 @@ const Routes: React.FC = () => {
           name="Playlist"
           options={{ title: '' }}
           component={PlaylistScreen}
+        />
+        <Stack.Screen
+          name="QRCodeShare"
+          options={{ title: 'Evie uma música' }}
+          component={QRCodeShareScreen}
         />
       </Stack.Navigator>
     </NavigationContainer>

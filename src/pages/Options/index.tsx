@@ -1,4 +1,3 @@
-// eslint-disable-next-line no-use-before-define
 import React from 'react'
 import { Text, ScrollView, Keyboard } from 'react-native'
 import { showMessage } from 'react-native-flash-message'
@@ -46,7 +45,6 @@ const OptionsScreen: React.FC = () => {
             resultForYoutube
           })
           inputModal.close()
-          // urlInfo.clear()
         } catch (e) {
           showMessage({
             message: 'Ocorreu um erro, verifique a url',

@@ -29,6 +29,8 @@
 	"prettier/prettier": "error",
 	"space-before-function-paren": "off",
 	"react/prop-types": "off",
+	"no-use-before-define":"off",
+	"@typescript-eslint/no-use-before-define":["error"],
 	"import-helpers/order-imports":[
 	 "warn",{
 		"newlinesBetween":"always",
