@@ -1,4 +1,3 @@
-// eslint-disable-next-line no-use-before-define
 import React from 'react'
 import { View, Image, DeviceEventEmitter } from 'react-native'
 import { showMessage } from 'react-native-flash-message'
@@ -10,7 +9,10 @@ import { useLoadFadedScreen } from '../../components/LoadFadedScreen'
 import MusicListDrag from '../../components/MusicListDrag'
 import { getPlayerListenners } from '../../contexts/player/listenners'
 import { usePlayerContext } from '../../contexts/player/use'
-import MusicInfo, { useMusicInfo } from '../../modals/MusicInfo'
+import {
+  MusicOptionsModal,
+  useMusicOptionsModal
+} from '../../modals/MusicOptions'
 import { useDatabase } from '../../services/database'
 import { useMusicTable } from '../../services/database/tables/music'
 import { usePlaylistsTable } from '../../services/database/tables/playlists'
@@ -30,12 +32,11 @@ const PlaylistScreen: React.FC = () => {
   const loadedScreen = useLoadFadedScreen()
   const player = usePlayerContext()
   const playerListenners = getPlayerListenners(player)
-  const musicInfo = useMusicInfo()
+  const musicOptions = useMusicOptionsModal()
   const musicTable = useMusicTable(database)
 
   const deleteMusic = React.useCallback(
     async (musicId: string) => {
-      musicInfo.close()
       loadedScreen?.open()
       try {
         await musicTable.delete(musicId)
@@ -68,38 +69,6 @@ const PlaylistScreen: React.FC = () => {
   const handleToArtist = React.useCallback((artistId: string) => {
     navigation.navigate('Artist', { artistId })
   }, [])
-
-  const onMoreCallback = React.useCallback(
-    async (musicId: string) => {
-      const music = musics?.find(
-        music => music.id === musicId
-      ) as IMusicInPlaylist
-      musicInfo.open({
-        id: music.id,
-        name: music.name,
-        playlistItemId: music.playlistItemId,
-        artist: {
-          id: music.artist.id,
-          name: music.artist.name
-        }
-      })
-    },
-    [...playerListenners, musics]
-  )
-  const musicPressCallback = React.useCallback(
-    async (musicId: string) => {
-      loadedScreen?.open()
-      try {
-        const musicIndex = musics?.findIndex(
-          music => music.id === musicId
-        ) as number
-        await player.startPlaylist(musics as IMusicInPlaylist[], musicIndex)
-      } finally {
-        loadedScreen?.close()
-      }
-    },
-    [...playerListenners, musics]
-  )
   const handleToRemoveMusicFromPlaylist = React.useCallback(
     async (playlistItemId: number) => {
       loadedScreen?.open()
@@ -129,6 +98,37 @@ const PlaylistScreen: React.FC = () => {
       }
     },
     [musics]
+  )
+  const onMoreCallback = React.useCallback(
+    async (musicId: string) => {
+      const music = musics?.find(
+        music => music.id === musicId
+      ) as IMusicInPlaylist
+      musicOptions?.open({
+        id: music.id,
+        name: music.name,
+        playlistItemId: music.playlistItemId,
+        artist: {
+          id: music.artist.id,
+          name: music.artist.name
+        }
+      })
+    },
+    [...playerListenners, musics]
+  )
+  const musicPressCallback = React.useCallback(
+    async (musicId: string) => {
+      loadedScreen?.open()
+      try {
+        const musicIndex = musics?.findIndex(
+          music => music.id === musicId
+        ) as number
+        await player.startPlaylist(musics as IMusicInPlaylist[], musicIndex)
+      } finally {
+        loadedScreen?.close()
+      }
+    },
+    [...playerListenners, musics]
   )
   const handleToUpdatePlaylistMusicPositions = React.useCallback(
     async (newPlaylistToReorder: IMusicInPlaylist[]) => {
@@ -213,8 +213,8 @@ const PlaylistScreen: React.FC = () => {
           onMore={onMoreCallback}
           onPress={musicPressCallback}
         />
-        <MusicInfo
-          {...musicInfo.props}
+        <MusicOptionsModal
+          {...musicOptions.props}
           methods={{
             deleteMusic,
             handleToArtist,

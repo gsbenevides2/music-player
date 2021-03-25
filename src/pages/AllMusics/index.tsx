@@ -1,4 +1,3 @@
-// eslint-disable-next-line no-use-before-define
 import React from 'react'
 import { View, Image, DeviceEventEmitter } from 'react-native'
 import { showMessage } from 'react-native-flash-message'
@@ -10,7 +9,10 @@ import { useLoadFadedScreen } from '../../components/LoadFadedScreen'
 import MusicList from '../../components/MusicList'
 import { getPlayerListenners } from '../../contexts/player/listenners'
 import { usePlayerContext } from '../../contexts/player/use'
-import MusicInfo, { useMusicInfo } from '../../modals/MusicInfo'
+import {
+  MusicOptionsModal,
+  useMusicOptionsModal
+} from '../../modals/MusicOptions'
 import { useSelectPlaylistModal } from '../../modals/SelectPlalist'
 import { useDatabase } from '../../services/database'
 import { useMusicTable } from '../../services/database/tables/music'
@@ -40,10 +42,10 @@ const AllMusicsScreen: React.FC = () => {
   const plalistTable = usePlaylistsTable(database)
   const plalistSelectorModal = useSelectPlaylistModal()
   const player = usePlayerContext()
+  const musicOptions = useMusicOptionsModal()
   const playerListenners = [musics, ...getPlayerListenners(player)]
-  const musicInfo = useMusicInfo()
+
   const deleteMusic = React.useCallback((musicId: string) => {
-    musicInfo.close()
     loadedScreen?.open()
     musicTable
       .delete(musicId)
@@ -67,28 +69,7 @@ const AllMusicsScreen: React.FC = () => {
   const handleToArtist = React.useCallback((artistId: string) => {
     navigation.navigate('Artist', { artistId })
   }, [])
-  const musicPressCallback = React.useCallback(async (musicId: string) => {
-    loadedScreen?.open()
-    try {
-      const musicIndex = musics?.findIndex(music => music.id === musicId)
-      await player.startPlaylist(musics as IMusic[], musicIndex as number)
-    } finally {
-      loadedScreen?.close()
-    }
-  }, playerListenners)
-  const onMoreCallback = React.useCallback(async (musicId: string) => {
-    const music = musics?.find(music => music.id === musicId) as IMusic
-    musicInfo.open({
-      id: music.id,
-      name: music.name,
-      artist: {
-        id: music.artist.id,
-        name: music.artist.name
-      }
-    })
-  }, playerListenners)
-  const openPlaylitsSelector = React.useCallback(async () => {
-    musicInfo.close()
+  const openPlaylitsSelector = React.useCallback(async (musicId: string) => {
     loadedScreen?.open()
     try {
       const playlists = await plalistTable.list()
@@ -96,7 +77,7 @@ const AllMusicsScreen: React.FC = () => {
       const playlistId = await plalistSelectorModal?.(playlists)
       loadedScreen?.open()
       if (!playlistId) return
-      await plalistTable.addToPlalist(playlistId, musicInfo.props.data.id)
+      await plalistTable.addToPlalist(playlistId, musicId)
       showMessage({
         type: 'success',
         message: 'Adicionado com sucesso!'
@@ -109,7 +90,32 @@ const AllMusicsScreen: React.FC = () => {
     } finally {
       loadedScreen?.close()
     }
-  }, [musicInfo.props.data.id])
+  }, [])
+  const onMoreCallback = React.useCallback(
+    async (musicId: string) => {
+      const music = musics?.find(music => music.id === musicId) as IMusic
+      musicOptions.open({
+        id: music.id,
+        name: music.name,
+        artist: {
+          id: music.artist.id,
+          name: music.artist.name
+        }
+      })
+    },
+    [musics]
+  )
+
+  const musicPressCallback = React.useCallback(async (musicId: string) => {
+    loadedScreen?.open()
+    try {
+      const musicIndex = musics?.findIndex(music => music.id === musicId)
+      await player.startPlaylist(musics as IMusic[], musicIndex as number)
+    } finally {
+      loadedScreen?.close()
+    }
+  }, playerListenners)
+
   React.useEffect(() => {
     async function load() {
       const musics = await musicTable.list()
@@ -136,12 +142,12 @@ const AllMusicsScreen: React.FC = () => {
           musics={musics}
           onPress={musicPressCallback}
         />
-        <MusicInfo
-          {...musicInfo.props}
+        <MusicOptionsModal
+          {...musicOptions.props}
           methods={{
+            addMusicToPlaylist: openPlaylitsSelector,
             deleteMusic,
-            handleToArtist,
-            addMusicToPlaylist: openPlaylitsSelector
+            handleToArtist
           }}
         />
       </View>

@@ -1,4 +1,3 @@
-// eslint-disable-next-line no-use-before-define
 import React from 'react'
 import { View, ImageBackground, Image, DeviceEventEmitter } from 'react-native'
 import { showMessage } from 'react-native-flash-message'
@@ -10,7 +9,10 @@ import { useLoadFadedScreen } from '../../components/LoadFadedScreen'
 import MusicList from '../../components/MusicList'
 import { getPlayerListenners } from '../../contexts/player/listenners'
 import { usePlayerContext } from '../../contexts/player/use'
-import MusicInfo, { useMusicInfo } from '../../modals/MusicInfo'
+import {
+  MusicOptionsModal,
+  useMusicOptionsModal
+} from '../../modals/MusicOptions'
 import { useSelectPlaylistModal } from '../../modals/SelectPlalist'
 import { useDatabase } from '../../services/database'
 import { useArtistTable } from '../../services/database/tables/artists'
@@ -22,6 +24,7 @@ import styles from './styles'
 interface ScreenParams {
   artistId: string
 }
+
 const ArtistScreen: React.FC = () => {
   const loadedScreen = useLoadFadedScreen()
   const [artist, setArtist] = React.useState<IArtist | null>()
@@ -36,11 +39,10 @@ const ArtistScreen: React.FC = () => {
   const plalistTable = usePlaylistsTable(database)
   const playlistSelectorModal = useSelectPlaylistModal()
   const { artistId } = route.params as ScreenParams
+  const musicOptions = useMusicOptionsModal()
 
-  const musicInfo = useMusicInfo()
   const deleteMusic = React.useCallback(
     async (musicId: string) => {
-      musicInfo.close()
       loadedScreen?.open()
       try {
         await musicsTable.delete(musicId)
@@ -60,6 +62,42 @@ const ArtistScreen: React.FC = () => {
       }
     },
     [musics, ...playerListenners]
+  )
+  const openPlaylitsSelector = React.useCallback(async (musicId: string) => {
+    loadedScreen?.open()
+    try {
+      const playlists = await plalistTable.list()
+      loadedScreen?.close()
+      const playlistId = await playlistSelectorModal?.(playlists)
+      if (!playlistId) return
+      loadedScreen?.open()
+      await plalistTable.addToPlalist(playlistId, musicId)
+      showMessage({
+        type: 'success',
+        message: 'Adicionado com sucesso!'
+      })
+    } catch (e) {
+      showMessage({
+        type: 'danger',
+        message: 'Erro ao tentar adicionar música a playlist!'
+      })
+    } finally {
+      loadedScreen?.close()
+    }
+  }, [])
+  const onMoreCallback = React.useCallback(
+    async (musicId: string) => {
+      const music = musics?.find(music => music.id === musicId) as IMusic
+      musicOptions?.open({
+        id: music.id,
+        name: music.name,
+        artist: {
+          id: music.artist.id,
+          name: music.artist.name
+        }
+      })
+    },
+    [musics]
   )
 
   const onPressMusic = React.useCallback(
@@ -95,43 +133,7 @@ const ArtistScreen: React.FC = () => {
       loadedScreen?.close()
     }
   }, [])
-  const onMoreCallback = React.useCallback(
-    async (musicId: string) => {
-      const music = musics?.find(music => music.id === musicId) as IMusic
-      musicInfo.open({
-        id: music.id,
-        name: music.name,
-        artist: {
-          id: music.artist.id,
-          name: music.artist.name
-        }
-      })
-    },
-    [musics]
-  )
 
-  const openPlaylitsSelector = React.useCallback(async () => {
-    musicInfo.close()
-    loadedScreen?.open()
-    try {
-      const playlists = await plalistTable.list()
-      const playlistId = await playlistSelectorModal?.(playlists)
-      if (!playlistId) return
-      loadedScreen?.open()
-      await plalistTable.addToPlalist(playlistId, musicInfo.props.data.id)
-      showMessage({
-        type: 'success',
-        message: 'Adicionado com sucesso!'
-      })
-    } catch (e) {
-      showMessage({
-        type: 'danger',
-        message: 'Erro ao tentar adicionar música a playlist!'
-      })
-    } finally {
-      loadedScreen?.close()
-    }
-  }, [musicInfo.props.data.id])
   React.useEffect(() => {
     async function loadArtistData() {
       const artist = await artistTable.getArtist(artistId)
@@ -191,12 +193,15 @@ const ArtistScreen: React.FC = () => {
               onMore={onMoreCallback}
               onPress={onPressMusic}
             />
+            <MusicOptionsModal
+              {...musicOptions.props}
+              methods={{
+                addMusicToPlaylist: openPlaylitsSelector,
+                deleteMusic
+              }}
+            />
           </View>
         </ImageBackground>
-        <MusicInfo
-          {...musicInfo.props}
-          methods={{ deleteMusic, addMusicToPlaylist: openPlaylitsSelector }}
-        />
       </View>
     )
   } else {

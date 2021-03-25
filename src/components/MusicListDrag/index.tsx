@@ -45,6 +45,7 @@ const Item: React.FC<ItemProps> = props => {
   const onMoreCallback = React.useCallback(() => {
     if (props.onMore) props.onMore(music.id)
   }, [props.onMore])
+  console.log('meu deus')
   return (
     <List.Item
       title={music.name}
@@ -53,16 +54,14 @@ const Item: React.FC<ItemProps> = props => {
       onLongPress={props.onDrag}
       left={() => <ImageAlbum url={music.coverUrl} />}
       right={propsIcon =>
-        props.onMore
-? (
+        props.onMore ? (
           <IconButton
             onPress={onMoreCallback}
             color={propsIcon.color}
             style={{ ...propsIcon.style, marginRight: 24 }}
             icon="dots-vertical"
           />
-        )
-: undefined
+            ) : undefined
       }
     />
   )
@@ -78,6 +77,7 @@ interface MusicLIstProps {
 
 const MemorizedItem = React.memo(Item)
 const MusicListDrag: React.FC<MusicLIstProps> = props => {
+  console.log('jesus')
   return (
     <DraggableFlatList
       data={props.musics}
@@ -96,4 +96,4 @@ const MusicListDrag: React.FC<MusicLIstProps> = props => {
     />
   )
 }
-export default MusicListDrag
+export default React.memo(MusicListDrag)

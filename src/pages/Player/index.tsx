@@ -1,4 +1,3 @@
-// eslint-disable-next-line no-use-before-define
 import React from 'react'
 import { View } from 'react-native'
 
@@ -23,6 +22,7 @@ export default function PlayerScreen() {
   const horizontal = useHorizontal()
   onNetworkUpdatesInPlayer()
   const playerListennersData = getPlayerListenners(player)
+
   const [isPlaying, setIsPlaying] = React.useState(false)
 
   const handlePlayOrPauseButton = React.useCallback(async () => {
@@ -44,6 +44,7 @@ export default function PlayerScreen() {
   const handleToPreviousMusic = React.useCallback(() => {
     player.playPrevious()
   }, playerListennersData)
+
   const handleToReproductionListScreen = React.useCallback(() => {
     navigation.navigate('ReproductionList')
   }, [])
@@ -64,9 +65,11 @@ export default function PlayerScreen() {
     },
     playerListennersData
   )
+
   React.useEffect(() => {
     player.sound?.setOnPlaybackStatusUpdate(handlePlaybackStatusUpdate)
-  }, playerListennersData)
+  }, [player.sound, player.isRepeat, player.isShuffle])
+
   return (
     <View
       style={horizontal ? styles.containerHorizontal : styles.containerVertical}
