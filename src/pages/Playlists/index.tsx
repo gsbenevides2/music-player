@@ -142,6 +142,16 @@ const PlaylistsScreen: React.FC = () => {
       DeviceEventEmitter.removeSubscription(subscription)
     }
   }, [])
+  const RenderItem = React.useCallback(
+    ({ item }: { item: Playlist }) => (
+      <PlaylistItem
+        data={item}
+        onDelete={handleDeletePlaylist}
+        onPress={handleToPlaylistScreen}
+      />
+    ),
+    []
+  )
   if (playlists === undefined) {
     return <View />
   } else if (playlists.length === 0) {
@@ -174,13 +184,7 @@ const PlaylistsScreen: React.FC = () => {
         <FlatList
           data={playlists}
           keyExtractor={item => item.id.toString()}
-          renderItem={({ item }) => (
-            <PlaylistItem
-              data={item}
-              onDelete={handleDeletePlaylist}
-              onPress={handleToPlaylistScreen}
-            />
-          )}
+          renderItem={RenderItem}
         />
         <FAB
           style={{

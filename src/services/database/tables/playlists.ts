@@ -32,13 +32,13 @@ interface IDatabasePlaylist {
   id: number
   name: string
 }
-interface UsePlalistsReturns {
+interface UsePlaylistsReturns {
   get: (id: number) => Promise<IPlaylist | null>
   create: (name: string) => Promise<number>
   list: () => Promise<IPlaylist[]>
   delete: (id: number) => Promise<void>
   listMusics(playlistId: number): Promise<IMusicInPlaylist[]>
-  addToPlalist(playlistId: number, musicId: string): Promise<void>
+  addToPlaylist(playlistId: number, musicId: string): Promise<void>
   removeFromPlaylist(id: number): Promise<void>
   updatePositions(playlist: IMusicInPlaylist[]): Promise<void>
 }
@@ -49,7 +49,7 @@ export interface IDatabasePlaylistWithMusic
 }
 export function usePlaylistsTable(
   database: DatabaseService
-): UsePlalistsReturns {
+): UsePlaylistsReturns {
   return {
     async get(id: number): Promise<IPlaylist | null> {
       const sqlResult = await database.execSQLQuery({
@@ -127,7 +127,7 @@ export function usePlaylistsTable(
         })
       } else throw new Error('Erro Desconhecido')
     },
-    async addToPlalist(playlistId: number, musicId: string): Promise<void> {
+    async addToPlaylist(playlistId: number, musicId: string): Promise<void> {
       const { length: lastPosition } = await this.listMusics(playlistId)
       await database.execSQLQuery({
         sql: [

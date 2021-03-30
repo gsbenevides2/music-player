@@ -8,7 +8,5 @@ export function getPlayerListenners(player: LoadedUsecontext): any[] {
     player.musicList,
     player.isShuffle,
     player.isRepeat
-    // player.timeDataTo,
-    // player.timeDataFrom
   ]
 }

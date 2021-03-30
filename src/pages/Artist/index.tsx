@@ -13,7 +13,7 @@ import {
   MusicOptionsModal,
   useMusicOptionsModal
 } from '../../modals/MusicOptions'
-import { useSelectPlaylistModal } from '../../modals/SelectPlalist'
+import { useSelectPlaylistModal } from '../../modals/SelectPlaylist'
 import { useDatabase } from '../../services/database'
 import { useArtistTable } from '../../services/database/tables/artists'
 import { useMusicTable } from '../../services/database/tables/music'
@@ -36,7 +36,7 @@ const ArtistScreen: React.FC = () => {
   const route = useRoute()
   const playerListenners = getPlayerListenners(player)
   const navigation = useNavigation()
-  const plalistTable = usePlaylistsTable(database)
+  const playlistTable = usePlaylistsTable(database)
   const playlistSelectorModal = useSelectPlaylistModal()
   const { artistId } = route.params as ScreenParams
   const musicOptions = useMusicOptionsModal()
@@ -66,12 +66,12 @@ const ArtistScreen: React.FC = () => {
   const openPlaylitsSelector = React.useCallback(async (musicId: string) => {
     loadedScreen?.open()
     try {
-      const playlists = await plalistTable.list()
+      const playlists = await playlistTable.list()
       loadedScreen?.close()
       const playlistId = await playlistSelectorModal?.(playlists)
       if (!playlistId) return
       loadedScreen?.open()
-      await plalistTable.addToPlalist(playlistId, musicId)
+      await playlistTable.addToPlaylist(playlistId, musicId)
       showMessage({
         type: 'success',
         message: 'Adicionado com sucesso!'

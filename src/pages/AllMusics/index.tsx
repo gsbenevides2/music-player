@@ -13,7 +13,7 @@ import {
   MusicOptionsModal,
   useMusicOptionsModal
 } from '../../modals/MusicOptions'
-import { useSelectPlaylistModal } from '../../modals/SelectPlalist'
+import { useSelectPlaylistModal } from '../../modals/SelectPlaylist'
 import { useDatabase } from '../../services/database'
 import { useMusicTable } from '../../services/database/tables/music'
 import { usePlaylistsTable } from '../../services/database/tables/playlists'
@@ -39,8 +39,8 @@ const AllMusicsScreen: React.FC = () => {
   const [musics, setMusics] = React.useState<IMusic[]>()
   const database = useDatabase()
   const musicTable = useMusicTable(database)
-  const plalistTable = usePlaylistsTable(database)
-  const plalistSelectorModal = useSelectPlaylistModal()
+  const playlistTable = usePlaylistsTable(database)
+  const playlistSelectorModal = useSelectPlaylistModal()
   const player = usePlayerContext()
   const musicOptions = useMusicOptionsModal()
   const playerListenners = [musics, ...getPlayerListenners(player)]
@@ -72,12 +72,12 @@ const AllMusicsScreen: React.FC = () => {
   const openPlaylitsSelector = React.useCallback(async (musicId: string) => {
     loadedScreen?.open()
     try {
-      const playlists = await plalistTable.list()
+      const playlists = await playlistTable.list()
       loadedScreen?.close()
-      const playlistId = await plalistSelectorModal?.(playlists)
+      const playlistId = await playlistSelectorModal?.(playlists)
       loadedScreen?.open()
       if (!playlistId) return
-      await plalistTable.addToPlalist(playlistId, musicId)
+      await playlistTable.addToPlaylist(playlistId, musicId)
       showMessage({
         type: 'success',
         message: 'Adicionado com sucesso!'

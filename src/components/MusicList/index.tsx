@@ -19,6 +19,7 @@ const ImageAlbum: React.FC<ImageAlbumProps> = ({ url }) => {
   return (
     <Image
       resizeMethod="resize"
+      resizeMode="cover"
       style={{
         width: 50,
         height: 50,
@@ -42,15 +43,10 @@ const Item: React.FC<ItemProps> = props => {
   const onMoreCallback = React.useCallback(() => {
     if (props.onMore) props.onMore(music.id)
   }, [])
-  return (
-    <List.Item
-      title={music.name}
-      onPress={onPressCallback}
-      description={music.artist.name}
-      left={() => <ImageAlbum url={music.coverUrl} />}
-      right={propsIcon =>
-        props.onMore
-? (
+  const right = React.useCallback(
+    propsIcon => {
+      if (props.onMore) {
+        return (
           <IconButton
             onPress={onMoreCallback}
             color={propsIcon.color}
@@ -58,8 +54,19 @@ const Item: React.FC<ItemProps> = props => {
             icon="dots-vertical"
           />
         )
-: undefined
+      } else {
+        return undefined
       }
+    },
+    [props.onMore, onMoreCallback]
+  )
+  return (
+    <List.Item
+      title={music.name}
+      onPress={onPressCallback}
+      description={music.artist.name}
+      left={() => <ImageAlbum url={music.coverUrl} />}
+      right={right}
     />
   )
 }
@@ -73,16 +80,20 @@ interface MusicLIstProps {
 
 const MemorizedItem = React.memo(Item)
 const MusicList: React.FC<MusicLIstProps> = props => {
+  const RenderMusicItem = React.useCallback(
+    ({ item }: { item: Music }) => (
+      <MemorizedItem
+        onMore={props.onMore}
+        onPress={props.onPress}
+        music={item}
+      />
+    ),
+    []
+  )
   return (
     <FlatList
       data={props.musics}
-      renderItem={({ item }) => (
-        <MemorizedItem
-          onMore={props.onMore}
-          onPress={props.onPress}
-          music={item}
-        />
-      )}
+      renderItem={RenderMusicItem}
       keyExtractor={item => item.id}
       onEndReached={props.onEndReached}
       onEndReachedThreshold={0.1}

@@ -86,6 +86,7 @@ const OptionsScreen: React.FC = () => {
       routes: [{ name: 'splash' }]
     })
   }, playerListenners)
+
   const handleAbout = React.useCallback(() => {
     WebBrowser.openBrowserAsync('https://github.com/gsbenevides2/music-player')
   }, [])

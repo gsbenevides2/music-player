@@ -44,7 +44,7 @@ export const SelectPlaylistModalProvider: React.FC = ({ children }) => {
       {children}
       <Portal>
         <Dialog visible={state.visible} onDismiss={close}>
-          <Dialog.Title>Selecione uma plalist</Dialog.Title>
+          <Dialog.Title>Selecione uma playlist</Dialog.Title>
           <Dialog.Content>
             <FlatList
               data={state.playlists}

@@ -13,7 +13,7 @@ import {
   MusicOptionsModal,
   useMusicOptionsModal
 } from '../../modals/MusicOptions'
-import { useSelectPlaylistModal } from '../../modals/SelectPlalist'
+import { useSelectPlaylistModal } from '../../modals/SelectPlaylist'
 import { useDatabase } from '../../services/database'
 import { useMusicTable } from '../../services/database/tables/music'
 import { usePlaylistsTable } from '../../services/database/tables/playlists'
@@ -35,11 +35,12 @@ export default function HomeScreen(): React.ReactElement {
   const database = useDatabase()
   const navigation = useNavigation()
   const musicTable = useMusicTable(database)
-  const plalistTable = usePlaylistsTable(database)
+  const playlistTable = usePlaylistsTable(database)
   const player = usePlayerContext()
   const playerListenners = getPlayerListenners(player)
   const musicOptions = useMusicOptionsModal()
   const playlistSelectorModal = useSelectPlaylistModal()
+  const [reproductionList, setReproductionList] = React.useState<IMusic[]>([])
 
   const deleteMusic = React.useCallback(async (musicId: string) => {
     loadedScreen?.open()
@@ -73,11 +74,11 @@ export default function HomeScreen(): React.ReactElement {
   const openPlaylitsSelector = React.useCallback(async (musicId: string) => {
     loadedScreen?.open()
     try {
-      const playlists = await plalistTable.list()
+      const playlists = await playlistTable.list()
       const playlistId = await playlistSelectorModal?.(playlists)
       if (!playlistId) return
       loadedScreen?.open()
-      await plalistTable.addToPlalist(playlistId, musicId)
+      await playlistTable.addToPlaylist(playlistId, musicId)
       showMessage({
         type: 'success',
         message: 'Adicionado com sucesso!'
@@ -93,7 +94,7 @@ export default function HomeScreen(): React.ReactElement {
   }, [])
   const onMoreCallback = React.useCallback(
     (musicId: string) => {
-      const music = player.musicList?.find(
+      const music = reproductionList.find(
         music => music.id === musicId
       ) as IMusic
       musicOptions.open({
@@ -105,10 +106,12 @@ export default function HomeScreen(): React.ReactElement {
         }
       })
     },
-    [player.musicList]
+    [reproductionList]
   )
   const musicListChange = React.useCallback((musics: IMusic[]) => {
+    loadedScreen?.open()
     player.setMusicList(musics)
+    loadedScreen?.close()
   }, playerListenners)
   const musicPressCallback = React.useCallback(async (musicId: string) => {
     loadedScreen?.open()
@@ -123,11 +126,14 @@ export default function HomeScreen(): React.ReactElement {
       loadedScreen?.close()
     }
   }, playerListenners)
-  if (player.musicList && player.musicList.length) {
+  React.useEffect(() => {
+    setReproductionList(player.musicList || [])
+  }, [player.musicList])
+  if (reproductionList.length) {
     return (
       <View style={{ flex: 1 }}>
         <MusicListDrag
-          musics={player.musicList || []}
+          musics={reproductionList}
           onMusicListChange={musics => musicListChange(musics as IMusic[])}
           onPress={musicPressCallback}
           onMore={onMoreCallback}

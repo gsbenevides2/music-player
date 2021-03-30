@@ -1,7 +1,7 @@
 import React from 'react'
 import { Portal, Dialog, Paragraph, Button } from 'react-native-paper'
 
-import { AddToPlaylistButton } from './AddToPlalistButton'
+import { AddToPlaylistButton } from './AddToPlaylistButton'
 import { DeleteMusicButton } from './DeleteMusicButton'
 import { GoToArtistButton } from './GoToArtistsButton'
 import { RemoveFromActualMusicListButton } from './RemoveFromActualMusicListButton'

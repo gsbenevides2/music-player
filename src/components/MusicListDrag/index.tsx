@@ -1,7 +1,9 @@
 // eslint-disable-next-line no-use-before-define
 import React from 'react'
 import { Image } from 'react-native'
-import DraggableFlatList from 'react-native-draggable-flatlist'
+import DraggableFlatList, {
+  RenderItemParams
+} from 'react-native-draggable-flatlist'
 import { List, IconButton } from 'react-native-paper'
 
 interface Music {
@@ -21,6 +23,7 @@ const ImageAlbum: React.FC<ImageAlbumProps> = ({ url }) => {
   return (
     <Image
       resizeMethod="resize"
+      resizeMode="cover"
       style={{
         width: 50,
         height: 50,
@@ -45,7 +48,23 @@ const Item: React.FC<ItemProps> = props => {
   const onMoreCallback = React.useCallback(() => {
     if (props.onMore) props.onMore(music.id)
   }, [props.onMore])
-  console.log('meu deus')
+  const right = React.useCallback(
+    propsIcon => {
+      if (props.onMore) {
+        return (
+          <IconButton
+            onPress={onMoreCallback}
+            color={propsIcon.color}
+            style={{ ...propsIcon.style, marginRight: 24 }}
+            icon="dots-vertical"
+          />
+        )
+      } else {
+        return undefined
+      }
+    },
+    [props.onMore, onMoreCallback]
+  )
   return (
     <List.Item
       title={music.name}
@@ -53,16 +72,7 @@ const Item: React.FC<ItemProps> = props => {
       description={music.artist.name}
       onLongPress={props.onDrag}
       left={() => <ImageAlbum url={music.coverUrl} />}
-      right={propsIcon =>
-        props.onMore ? (
-          <IconButton
-            onPress={onMoreCallback}
-            color={propsIcon.color}
-            style={{ ...propsIcon.style, marginRight: 24 }}
-            icon="dots-vertical"
-          />
-            ) : undefined
-      }
+      right={right}
     />
   )
 }
@@ -77,22 +87,32 @@ interface MusicLIstProps {
 
 const MemorizedItem = React.memo(Item)
 const MusicListDrag: React.FC<MusicLIstProps> = props => {
-  console.log('jesus')
+  const RenderItem = React.useCallback(
+    ({ item, drag }: RenderItemParams<Music>) => (
+      <MemorizedItem
+        onMore={props.onMore}
+        onPress={props.onPress}
+        onDrag={drag}
+        music={item}
+      />
+    ),
+    []
+  )
+  const DragEnd = React.useCallback(
+    ({ data }: { data: Music[] }) => {
+      props.onMusicListChange(data)
+    },
+    [props.onMusicListChange]
+  )
+  const keyExtractor = React.useCallback((item: Music) => {
+    return item.playlistItemId ? item.playlistItemId.toString() : item.id
+  }, [])
   return (
     <DraggableFlatList
       data={props.musics}
-      renderItem={({ item, drag }) => (
-        <MemorizedItem
-          onMore={props.onMore}
-          onPress={props.onPress}
-          onDrag={drag}
-          music={item}
-        />
-      )}
-      keyExtractor={item =>
-        item.playlistItemId ? item.playlistItemId.toString() : item.id
-      }
-      onDragEnd={({ data }) => props.onMusicListChange(data)}
+      renderItem={RenderItem}
+      keyExtractor={keyExtractor}
+      onDragEnd={DragEnd}
     />
   )
 }

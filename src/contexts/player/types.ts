@@ -10,8 +10,6 @@ export interface PlayerState {
   musicList: IMusic[]
   isShuffle: boolean
   isRepeat: boolean
-  timeDataTo: number
-  timeDataFrom: number
 }
 
 export interface AsyncStoragePlayerState {
@@ -20,8 +18,6 @@ export interface AsyncStoragePlayerState {
   musicList: IMusic[]
   isShuffle: boolean
   isRepeat: boolean
-  timeDataTo: number
-  timeDataFrom: number
 }
 export interface ContextInterface {
   playerState: PlayerState
@@ -39,7 +35,6 @@ export interface LoadedUsecontext {
   setMusicList: (musics: IMusic[]) => void
   setShuffle: () => void
   setRepeat: () => void
-  setTimeData: (to: number, from: number) => void
   removeMusicFromMusicList: (musicId: string) => Promise<void>
   removeArtistFromMusicList: (artistId: string) => Promise<void>
   clearData: () => Promise<void>
@@ -48,6 +43,4 @@ export interface LoadedUsecontext {
   musicList?: IMusic[]
   isShuffle?: boolean
   isRepeat?: boolean
-  timeDataTo?: number
-  timeDataFrom?: number
 }

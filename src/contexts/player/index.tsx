@@ -18,13 +18,14 @@ export const PlayerProvider: React.FC = ({ children }) => {
     musicList: [],
     sound,
     isShuffle: false,
-    isRepeat: false,
-    timeDataTo: 0,
-    timeDataFrom: 0
+    isRepeat: false
   })
   React.useEffect(() => {
     AsyncStorage.getItem('playerContext')
       .then(async value => {
+        const timerData = JSON.parse(
+          (await AsyncStorage.getItem('timerContext')) as string
+        )
         if (value) {
           const newPlayerState = JSON.parse(value) as AsyncStoragePlayerState
           if (newPlayerState.musicActualy) {
@@ -37,7 +38,7 @@ export const PlayerProvider: React.FC = ({ children }) => {
                 uri: musicUrl
               },
               {
-                positionMillis: newPlayerState.timeDataFrom
+                positionMillis: timerData.timeDataFrom
               }
             )
             setPlayerState({
@@ -49,9 +50,7 @@ export const PlayerProvider: React.FC = ({ children }) => {
               musicList: [],
               sound,
               isShuffle: false,
-              isRepeat: false,
-              timeDataTo: 0,
-              timeDataFrom: 0
+              isRepeat: false
             })
           }
         }
@@ -61,9 +60,7 @@ export const PlayerProvider: React.FC = ({ children }) => {
           musicList: [],
           sound,
           isShuffle: false,
-          isRepeat: false,
-          timeDataTo: 0,
-          timeDataFrom: 0
+          isRepeat: false
         })
       })
   }, [])
@@ -71,8 +68,6 @@ export const PlayerProvider: React.FC = ({ children }) => {
     const serializedPlayerState = { ...playerState, sound: undefined }
     AsyncStorage.setItem('playerContext', JSON.stringify(serializedPlayerState))
   }, [
-    playerState.timeDataFrom,
-    playerState.timeDataTo,
     playerState.musicList,
     playerState.isRepeat,
     playerState.isRepeat,

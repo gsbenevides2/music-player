@@ -14,7 +14,6 @@ import { removeMusicFromMusicList } from './removeMusicFromMusicList'
 import { setMusicList } from './setMusicList'
 import { setRepeat } from './setRepeat'
 import { setShuffle } from './setShuffle'
-import { setTimeData } from './setTimeData'
 import { startPlaylist } from './startPlayList'
 
 export function usePlayerContext(): LoadedUsecontext {
@@ -30,7 +29,6 @@ export function usePlayerContext(): LoadedUsecontext {
     setMusicList: setMusicList(playerContext),
     setShuffle: setShuffle(playerContext),
     setRepeat: setRepeat(playerContext),
-    setTimeData: setTimeData(playerContext),
     removeMusicFromMusicList: removeMusicFromMusicList(
       playerContext,
       youtubeService

@@ -6,6 +6,7 @@ import { AVPlaybackStatus } from 'expo-av'
 
 import { getPlayerListenners } from '../../contexts/player/listenners'
 import { usePlayerContext } from '../../contexts/player/use'
+import { useTimerContext } from '../../contexts/timer'
 import { useHorizontal } from '../../useHorizontal'
 import { onNetworkUpdatesInPlayer } from '../NoNetwork'
 import { AlbumImageMemorized } from './components/AlbumImage'
@@ -20,6 +21,7 @@ export default function PlayerScreen() {
   const navigation = useNavigation()
   const player = usePlayerContext()
   const horizontal = useHorizontal()
+  const timer = useTimerContext()
   onNetworkUpdatesInPlayer()
   const playerListennersData = getPlayerListenners(player)
 
@@ -48,28 +50,28 @@ export default function PlayerScreen() {
   const handleToReproductionListScreen = React.useCallback(() => {
     navigation.navigate('ReproductionList')
   }, [])
-  const handlePlaybackStatusUpdate = React.useCallback(
+  const playbackStatusUpdated = React.useCallback(
     (playbackStatus: AVPlaybackStatus) => {
       if (playbackStatus.isLoaded) {
-        player.setTimeData(
+        timer?.set(
           playbackStatus.durationMillis || 0,
           playbackStatus.positionMillis
         )
         if (playbackStatus.didJustFinish) {
           player.playNext()
         }
-        setIsPlaying(playbackStatus.isPlaying)
+        if (isPlaying !== playbackStatus.isPlaying) {
+          setIsPlaying(playbackStatus.isPlaying)
+        }
       } else {
         setIsPlaying(false)
       }
     },
-    playerListennersData
+    [...playerListennersData, isPlaying]
   )
-
   React.useEffect(() => {
-    player.sound?.setOnPlaybackStatusUpdate(handlePlaybackStatusUpdate)
-  }, [player.sound, player.isRepeat, player.isShuffle])
-
+    player.sound?.setOnPlaybackStatusUpdate(playbackStatusUpdated)
+  }, [...playerListennersData, isPlaying])
   return (
     <View
       style={horizontal ? styles.containerHorizontal : styles.containerVertical}
@@ -99,8 +101,8 @@ export default function PlayerScreen() {
             openReproductionList={handleToReproductionListScreen}
           />
           <MusicProgressBarMemorized
-            to={player.timeDataTo || 0}
-            from={player.timeDataFrom || 0}
+            to={timer?.timeDataTo || 0}
+            from={timer?.timeDataFrom || 0}
             handleSliderPosition={handleSliderPosition}
           />
           <PlayerButtonsMemorized
