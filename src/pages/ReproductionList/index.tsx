@@ -9,10 +9,7 @@ import { useLoadFadedScreen } from '../../components/LoadFadedScreen'
 import MusicListDrag from '../../components/MusicListDrag'
 import { getPlayerListenners } from '../../contexts/player/listenners'
 import { usePlayerContext } from '../../contexts/player/use'
-import {
-  MusicOptionsModal,
-  useMusicOptionsModal
-} from '../../modals/MusicOptions'
+import { useMusicOptionsModal } from '../../modals/MusicOptions'
 import { useSelectPlaylistModal } from '../../modals/SelectPlaylist'
 import { useDatabase } from '../../services/database'
 import { useMusicTable } from '../../services/database/tables/music'
@@ -97,21 +94,29 @@ export default function HomeScreen(): React.ReactElement {
       const music = reproductionList.find(
         music => music.id === musicId
       ) as IMusic
-      musicOptions.open({
-        id: music.id,
-        name: music.name,
-        artist: {
-          id: music.artist.id,
-          name: music.artist.name
+      musicOptions?.open(
+        {
+          id: music.id,
+          name: music.name,
+          artist: {
+            id: music.artist.id,
+            name: music.artist.name
+          }
+        },
+        {
+          removeFromActualMusicList: removeFromMusicList,
+          deleteMusic,
+          handleToArtist,
+          addMusicToPlaylist: openPlaylitsSelector
         }
-      })
+      )
     },
     [reproductionList]
   )
   const musicListChange = React.useCallback((musics: IMusic[]) => {
     loadedScreen?.open()
     player.setMusicList(musics)
-    loadedScreen?.close()
+    setTimeout(loadedScreen?.close, 3000)
   }, playerListenners)
   const musicPressCallback = React.useCallback(async (musicId: string) => {
     loadedScreen?.open()
@@ -137,15 +142,6 @@ export default function HomeScreen(): React.ReactElement {
           onMusicListChange={musics => musicListChange(musics as IMusic[])}
           onPress={musicPressCallback}
           onMore={onMoreCallback}
-        />
-        <MusicOptionsModal
-          {...musicOptions.props}
-          methods={{
-            removeFromActualMusicList: removeFromMusicList,
-            deleteMusic,
-            handleToArtist,
-            addMusicToPlaylist: openPlaylitsSelector
-          }}
         />
       </View>
     )

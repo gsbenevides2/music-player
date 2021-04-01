@@ -9,10 +9,7 @@ import { useLoadFadedScreen } from '../../components/LoadFadedScreen'
 import MusicList from '../../components/MusicList'
 import { getPlayerListenners } from '../../contexts/player/listenners'
 import { usePlayerContext } from '../../contexts/player/use'
-import {
-  MusicOptionsModal,
-  useMusicOptionsModal
-} from '../../modals/MusicOptions'
+import { useMusicOptionsModal } from '../../modals/MusicOptions'
 import { useSelectPlaylistModal } from '../../modals/SelectPlaylist'
 import { useDatabase } from '../../services/database'
 import { useArtistTable } from '../../services/database/tables/artists'
@@ -88,14 +85,20 @@ const ArtistScreen: React.FC = () => {
   const onMoreCallback = React.useCallback(
     async (musicId: string) => {
       const music = musics?.find(music => music.id === musicId) as IMusic
-      musicOptions?.open({
-        id: music.id,
-        name: music.name,
-        artist: {
-          id: music.artist.id,
-          name: music.artist.name
+      musicOptions?.open(
+        {
+          id: music.id,
+          name: music.name,
+          artist: {
+            id: music.artist.id,
+            name: music.artist.name
+          }
+        },
+        {
+          addMusicToPlaylist: openPlaylitsSelector,
+          deleteMusic
         }
-      })
+      )
     },
     [musics]
   )
@@ -192,13 +195,6 @@ const ArtistScreen: React.FC = () => {
               musics={musics}
               onMore={onMoreCallback}
               onPress={onPressMusic}
-            />
-            <MusicOptionsModal
-              {...musicOptions.props}
-              methods={{
-                addMusicToPlaylist: openPlaylitsSelector,
-                deleteMusic
-              }}
             />
           </View>
         </ImageBackground>

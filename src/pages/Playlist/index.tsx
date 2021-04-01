@@ -9,10 +9,7 @@ import { useLoadFadedScreen } from '../../components/LoadFadedScreen'
 import MusicListDrag from '../../components/MusicListDrag'
 import { getPlayerListenners } from '../../contexts/player/listenners'
 import { usePlayerContext } from '../../contexts/player/use'
-import {
-  MusicOptionsModal,
-  useMusicOptionsModal
-} from '../../modals/MusicOptions'
+import { useMusicOptionsModal } from '../../modals/MusicOptions'
 import { useDatabase } from '../../services/database'
 import { useMusicTable } from '../../services/database/tables/music'
 import { usePlaylistsTable } from '../../services/database/tables/playlists'
@@ -104,15 +101,22 @@ const PlaylistScreen: React.FC = () => {
       const music = musics?.find(
         music => music.id === musicId
       ) as IMusicInPlaylist
-      musicOptions?.open({
-        id: music.id,
-        name: music.name,
-        playlistItemId: music.playlistItemId,
-        artist: {
-          id: music.artist.id,
-          name: music.artist.name
+      musicOptions?.open(
+        {
+          id: music.id,
+          name: music.name,
+          playlistItemId: music.playlistItemId,
+          artist: {
+            id: music.artist.id,
+            name: music.artist.name
+          }
+        },
+        {
+          deleteMusic,
+          handleToArtist,
+          removeMusicFromPlaylist: handleToRemoveMusicFromPlaylist
         }
-      })
+      )
     },
     [...playerListenners, musics]
   )
@@ -212,14 +216,6 @@ const PlaylistScreen: React.FC = () => {
           }
           onMore={onMoreCallback}
           onPress={musicPressCallback}
-        />
-        <MusicOptionsModal
-          {...musicOptions.props}
-          methods={{
-            deleteMusic,
-            handleToArtist,
-            removeMusicFromPlaylist: handleToRemoveMusicFromPlaylist
-          }}
         />
       </View>
     )

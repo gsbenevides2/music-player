@@ -11,6 +11,7 @@ import { PlayerProvider } from './src/contexts/player'
 import { TimerProvider } from './src/contexts/timer'
 import { ConfirmModalProvider } from './src/modals/Confirm'
 import { InputModalProvider } from './src/modals/Input'
+import { MusicOptionsProvider } from './src/modals/MusicOptions'
 import { SelectPlaylistModalProvider } from './src/modals/SelectPlaylist'
 import Routes from './src/routes'
 import { DatabaseProvider } from './src/services/database'
@@ -23,17 +24,19 @@ const App: React.FC = () => {
       <PlayerProvider>
         <TimerProvider>
           <LoadFadedScreenProvider>
-            <InputModalProvider>
-              <SelectPlaylistModalProvider>
-                <ConfirmModalProvider>
-                  <DatabaseProvider>
-                    <Routes />
-                    <StatusBar style="light" />
-                  </DatabaseProvider>
-                  <FlashMessage position="top" />
-                </ConfirmModalProvider>
-              </SelectPlaylistModalProvider>
-            </InputModalProvider>
+            <MusicOptionsProvider>
+              <InputModalProvider>
+                <SelectPlaylistModalProvider>
+                  <ConfirmModalProvider>
+                    <DatabaseProvider>
+                      <Routes />
+                      <StatusBar style="light" />
+                    </DatabaseProvider>
+                    <FlashMessage position="top" />
+                  </ConfirmModalProvider>
+                </SelectPlaylistModalProvider>
+              </InputModalProvider>
+            </MusicOptionsProvider>
           </LoadFadedScreenProvider>
         </TimerProvider>
       </PlayerProvider>

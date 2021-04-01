@@ -23,89 +23,86 @@ interface Methods {
   removeMusicFromPlaylist?: (playlistItemId: number) => void
   deleteMusic?: (musicId: string) => void
 }
-interface Props {
+interface ContextState {
   visible: boolean
-  close: () => void
-  data: MusicData
+  data?: MusicData
   methods: Methods
 }
-
-export const MusicOptionsModal: React.FC<Props> = props => {
-  return (
-    <Portal>
-      <Dialog visible={props.visible} onDismiss={props.close}>
-        <Dialog.Title>Informações da Música</Dialog.Title>
-        <Dialog.Content>
-          <Paragraph>Nome da Música: {props.data.name}</Paragraph>
-          <Paragraph>Nome do Artista: {props.data.artist.name}</Paragraph>
-          <GoToArtistButton
-            artistId={props.data.artist.id}
-            close={props.close}
-            onPress={props.methods.handleToArtist}
-          />
-          <AddToPlaylistButton
-            musicId={props.data.id}
-            close={props.close}
-            onPress={props.methods.addMusicToPlaylist}
-          />
-          <RemoveFromPlaylistButton
-            playlistItemId={props.data.playlistItemId}
-            close={props.close}
-            onPress={props.methods.removeMusicFromPlaylist}
-          />
-          <RemoveFromActualMusicListButton
-            musicId={props.data.id}
-            close={props.close}
-            onPress={props.methods.removeFromActualMusicList}
-          />
-          <DeleteMusicButton
-            musicId={props.data.id}
-            close={props.close}
-            onPress={props.methods.deleteMusic}
-          />
-        </Dialog.Content>
-        <Dialog.Actions>
-          <Button onPress={props.close}>Sair</Button>
-        </Dialog.Actions>
-      </Dialog>
-    </Portal>
-  )
+interface ContextValue {
+  state: ContextState
+  setState: React.Dispatch<React.SetStateAction<ContextState>>
 }
+const Context = React.createContext<ContextValue | undefined>(undefined)
 
-interface UseMusicOptionsModal {
-  props: {
-    visible: boolean
-    close: () => void
-    data: MusicData
-  }
-  open: (musicData: MusicData) => void
-  close: () => void
-}
-
-export function useMusicOptionsModal(): UseMusicOptionsModal {
-  const [visible, setVisible] = React.useState(false)
-  const [musicData, setMusicData] = React.useState<MusicData>({
-    id: '',
-    name: '',
-    artist: {
-      id: '',
-      name: ''
-    }
+export const MusicOptionsProvider: React.FC = props => {
+  const [state, setState] = React.useState<ContextState>({
+    visible: false,
+    methods: {}
   })
   const close = React.useCallback(() => {
-    setVisible(false)
+    setState({
+      visible: false,
+      methods: {}
+    })
   }, [])
-  const open = React.useCallback((musicData: MusicData) => {
-    setVisible(true)
-    setMusicData(musicData)
-  }, [])
-  return {
-    props: {
-      visible,
-      close,
-      data: musicData
-    },
-    open,
-    close
-  }
+  return (
+    <Context.Provider value={{ state, setState }}>
+      {props.children}
+      <Portal>
+        <Dialog visible={state.visible} onDismiss={close}>
+          <Dialog.Title>Informações da Música</Dialog.Title>
+          <Dialog.Content>
+            <Paragraph>Nome da Música: {state.data?.name}</Paragraph>
+            <Paragraph>Nome do Artista: {state.data?.artist.name}</Paragraph>
+            <GoToArtistButton
+              artistId={state.data?.artist.id}
+              close={close}
+              onPress={state.methods.handleToArtist}
+            />
+            <AddToPlaylistButton
+              musicId={state.data?.id}
+              close={close}
+              onPress={state.methods.addMusicToPlaylist}
+            />
+            <RemoveFromPlaylistButton
+              playlistItemId={state.data?.playlistItemId}
+              close={close}
+              onPress={state.methods.removeMusicFromPlaylist}
+            />
+            <RemoveFromActualMusicListButton
+              musicId={state.data?.id}
+              close={close}
+              onPress={state.methods.removeFromActualMusicList}
+            />
+            <DeleteMusicButton
+              musicId={state.data?.id}
+              close={close}
+              onPress={state.methods.deleteMusic}
+            />
+          </Dialog.Content>
+          <Dialog.Actions>
+            <Button onPress={close}>Sair</Button>
+          </Dialog.Actions>
+        </Dialog>
+      </Portal>
+    </Context.Provider>
+  )
+}
+interface UseMusicOptionsModal {
+  open: (musicData: MusicData, methods: Methods) => void
+}
+
+export function useMusicOptionsModal(): UseMusicOptionsModal | undefined {
+  const context = React.useContext(Context)
+  return context
+    ? {
+        open(data: MusicData, methods: Methods) {
+          context.setState({
+            visible: true,
+            data,
+            methods
+          })
+        }
+      }
+    : undefined
 }
