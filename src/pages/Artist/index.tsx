@@ -9,12 +9,13 @@ import { useLoadFadedScreen } from '../../components/LoadFadedScreen'
 import MusicList from '../../components/MusicList'
 import { getPlayerListenners } from '../../contexts/player/listenners'
 import { usePlayerContext } from '../../contexts/player/use'
-import { useMusicOptionsModal } from '../../modals/MusicOptions'
+import { Methods, useMusicOptionsModal } from '../../modals/MusicOptions'
+import {
+  openPlaylistSelector,
+  deleteMusic
+} from '../../modals/MusicOptions/hooks'
 import { useSelectPlaylistModal } from '../../modals/SelectPlaylist'
 import { useDatabase } from '../../services/database'
-import { useArtistTable } from '../../services/database/tables/artists'
-import { useMusicTable } from '../../services/database/tables/music'
-import { usePlaylistsTable } from '../../services/database/tables/playlists'
 import { IArtist, IMusic } from '../../types'
 import styles from './styles'
 
@@ -25,66 +26,35 @@ interface ScreenParams {
 const ArtistScreen: React.FC = () => {
   const loadedScreen = useLoadFadedScreen()
   const [artist, setArtist] = React.useState<IArtist | null>()
-  const [musics, setMusics] = React.useState<IMusic[]>()
+  const [musicList, setMusicList] = React.useState<IMusic[]>()
   const database = useDatabase()
-  const artistTable = useArtistTable(database)
-  const musicsTable = useMusicTable(database)
-  const player = usePlayerContext()
+  const playerContext = usePlayerContext()
   const route = useRoute()
-  const playerListenners = getPlayerListenners(player)
+  const playerListenners = getPlayerListenners(playerContext)
   const navigation = useNavigation()
-  const playlistTable = usePlaylistsTable(database)
   const playlistSelectorModal = useSelectPlaylistModal()
   const { artistId } = route.params as ScreenParams
   const musicOptions = useMusicOptionsModal()
-
-  const deleteMusic = React.useCallback(
-    async (musicId: string) => {
-      loadedScreen?.open()
-      try {
-        await musicsTable.delete(musicId)
-        setMusics(musics?.filter(music => music.id !== musicId))
-        await player.removeMusicFromMusicList(musicId)
-        showMessage({
-          message: 'Deletado com sucesso',
-          type: 'success'
-        })
-      } catch (e) {
-        showMessage({
-          message: 'Erro ao deletar',
-          type: 'danger'
-        })
-      } finally {
-        loadedScreen?.close()
-      }
-    },
-    [musics, ...playerListenners]
-  )
-  const openPlaylitsSelector = React.useCallback(async (musicId: string) => {
-    loadedScreen?.open()
-    try {
-      const playlists = await playlistTable.list()
-      loadedScreen?.close()
-      const playlistId = await playlistSelectorModal?.(playlists)
-      if (!playlistId) return
-      loadedScreen?.open()
-      await playlistTable.addToPlaylist(playlistId, musicId)
-      showMessage({
-        type: 'success',
-        message: 'Adicionado com sucesso!'
-      })
-    } catch (e) {
-      showMessage({
-        type: 'danger',
-        message: 'Erro ao tentar adicionar música a playlist!'
-      })
-    } finally {
-      loadedScreen?.close()
-    }
-  }, [])
+  const musicInfoCallbacks: Methods = {
+    addMusicToPlaylist: openPlaylistSelector(
+      database,
+      loadedScreen,
+      showMessage,
+      playlistSelectorModal
+    ),
+    deleteMusic: deleteMusic(
+      database,
+      loadedScreen,
+      setMusicList,
+      musicList,
+      playerContext,
+      playerListenners,
+      showMessage
+    )
+  }
   const onMoreCallback = React.useCallback(
     async (musicId: string) => {
-      const music = musics?.find(music => music.id === musicId) as IMusic
+      const music = musicList?.find(music => music.id === musicId) as IMusic
       musicOptions?.open(
         {
           id: music.id,
@@ -94,32 +64,30 @@ const ArtistScreen: React.FC = () => {
             name: music.artist.name
           }
         },
-        {
-          addMusicToPlaylist: openPlaylitsSelector,
-          deleteMusic
-        }
+        musicInfoCallbacks
       )
     },
-    [musics]
+    [musicList]
   )
-
   const onPressMusic = React.useCallback(
     async (musicId: string) => {
       loadedScreen?.open()
       try {
-        const index = musics?.findIndex(music => music.id === musicId) as number
-        await player.startPlaylist(musics as IMusic[], index)
+        const index = musicList?.findIndex(
+          music => music.id === musicId
+        ) as number
+        await playerContext.startPlaylist(musicList as IMusic[], index)
       } finally {
         loadedScreen?.close()
       }
     },
-    [musics, ...playerListenners]
+    [musicList, ...playerListenners]
   )
   const onDeleteArtist = React.useCallback(async () => {
     loadedScreen?.open()
     try {
-      await artistTable.delete(artistId)
-      await player.removeArtistFromMusicList(artistId)
+      await database.tables.artist.delete(artistId)
+      await playerContext.removeArtistFromMusicList(artistId)
       navigation.goBack()
       DeviceEventEmitter.emit('update-artists')
       DeviceEventEmitter.emit('update-music-list', [artistId])
@@ -135,11 +103,11 @@ const ArtistScreen: React.FC = () => {
     } finally {
       loadedScreen?.close()
     }
-  }, [])
+  }, playerListenners)
 
   React.useEffect(() => {
     async function loadArtistData() {
-      const artist = await artistTable.getArtist(artistId)
+      const artist = await database.tables.artist.getArtist(artistId)
       setArtist(artist)
       const HeaderRight = () => (
         <IconButton icon="delete" onPress={onDeleteArtist} size={25} />
@@ -154,15 +122,15 @@ const ArtistScreen: React.FC = () => {
     }
     loadArtistData()
     async function loadMusics() {
-      const musics = await musicsTable.getByArtistId(artistId)
-      setMusics(musics)
+      const musics = await database.tables.music.getByArtistId(artistId)
+      setMusicList(musics)
     }
     loadMusics()
     navigation.setOptions({})
   }, [])
   if (!artist) {
     return <View />
-  } else if (musics?.length === 0) {
+  } else if (musicList?.length === 0) {
     return (
       <View style={{ flex: 1 }}>
         <ImageBackground
@@ -183,7 +151,7 @@ const ArtistScreen: React.FC = () => {
         </ImageBackground>
       </View>
     )
-  } else if (musics?.length) {
+  } else if (musicList?.length) {
     return (
       <View style={{ flex: 1 }}>
         <ImageBackground
@@ -192,7 +160,7 @@ const ArtistScreen: React.FC = () => {
         >
           <View style={styles.overlay}>
             <MusicList
-              musics={musics}
+              musics={musicList}
               onMore={onMoreCallback}
               onPress={onPressMusic}
             />

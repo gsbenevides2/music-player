@@ -58,11 +58,11 @@ export const SelectPlaylistModalProvider: React.FC = ({ children }) => {
   )
 }
 
-type UseSelectPlaylistModalReturn = (playlists: IPlaylist[]) => Promise<number>
+export type UseSelectPlaylistModalReturn =
+  | ((playlists: IPlaylist[]) => Promise<number>)
+  | undefined
 
-export function useSelectPlaylistModal():
-  | UseSelectPlaylistModalReturn
-  | undefined {
+export function useSelectPlaylistModal(): UseSelectPlaylistModalReturn {
   const context = React.useContext(Context)
 
   if (context) {

@@ -6,6 +6,10 @@ import {
   ResultSet
 } from 'expo-sqlite'
 
+import { UseArtistsTable } from './tables/artists'
+import { UseMusicTableReturn } from './tables/music'
+import { UsePlaylistsReturns } from './tables/playlists'
+
 export interface GetMusicReturns {
   id: number
   name: string
@@ -40,4 +44,10 @@ export interface DatabaseServiceImplementation {
   deleteDb(): Promise<void>
   exportDatabase(): Promise<void>
   importDatabase(): Promise<void>
+  setTables(): void
+  tables?: {
+    artist: UseArtistsTable
+    music: UseMusicTableReturn
+    playlist: UsePlaylistsReturns
+  }
 }

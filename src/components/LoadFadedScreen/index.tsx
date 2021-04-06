@@ -24,11 +24,13 @@ export const LoadFadedScreenProvider: React.FC = ({ children }) => {
   )
 }
 
-interface UseLoadFadedScreen {
-  open: () => void
-  close: () => void
-}
-export function useLoadFadedScreen(): UseLoadFadedScreen | undefined {
+export type UseLoadFadedScreen =
+  | {
+      open: () => void
+      close: () => void
+    }
+  | undefined
+export function useLoadFadedScreen(): UseLoadFadedScreen {
   const context = React.useContext(Context)
   if (context) {
     return {

@@ -19,6 +19,7 @@ export default function SplashScreen(): React.ReactElement {
       ;(async function () {
         await database.enableForeignKeys()
         await database.createTables()
+        database.setTables()
         navigation.reset({
           index: 0,
           routes: [{ name: 'tabs' }]

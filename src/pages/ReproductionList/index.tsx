@@ -9,11 +9,13 @@ import { useLoadFadedScreen } from '../../components/LoadFadedScreen'
 import MusicListDrag from '../../components/MusicListDrag'
 import { getPlayerListenners } from '../../contexts/player/listenners'
 import { usePlayerContext } from '../../contexts/player/use'
-import { useMusicOptionsModal } from '../../modals/MusicOptions'
+import { Methods, useMusicOptionsModal } from '../../modals/MusicOptions'
+import {
+  goToArtists,
+  openPlaylistSelector
+} from '../../modals/MusicOptions/hooks'
 import { useSelectPlaylistModal } from '../../modals/SelectPlaylist'
 import { useDatabase } from '../../services/database'
-import { useMusicTable } from '../../services/database/tables/music'
-import { usePlaylistsTable } from '../../services/database/tables/playlists'
 import { IMusic } from '../../types'
 
 const NotPlaying: React.FC = () => (
@@ -31,18 +33,15 @@ export default function HomeScreen(): React.ReactElement {
   const loadedScreen = useLoadFadedScreen()
   const database = useDatabase()
   const navigation = useNavigation()
-  const musicTable = useMusicTable(database)
-  const playlistTable = usePlaylistsTable(database)
   const player = usePlayerContext()
   const playerListenners = getPlayerListenners(player)
   const musicOptions = useMusicOptionsModal()
   const playlistSelectorModal = useSelectPlaylistModal()
   const [reproductionList, setReproductionList] = React.useState<IMusic[]>([])
-
   const deleteMusic = React.useCallback(async (musicId: string) => {
     loadedScreen?.open()
     try {
-      await musicTable.delete(musicId)
+      await database.tables.music.delete(musicId)
       await player.removeMusicFromMusicList(musicId)
       showMessage({
         message: 'Deletado com sucesso',
@@ -57,9 +56,6 @@ export default function HomeScreen(): React.ReactElement {
       loadedScreen?.close()
     }
   }, playerListenners)
-  const handleToArtist = React.useCallback((artistId: string) => {
-    navigation.navigate('Artist', { artistId })
-  }, [])
   const removeFromMusicList = React.useCallback(async (musicId: string) => {
     loadedScreen?.open()
     try {
@@ -68,27 +64,18 @@ export default function HomeScreen(): React.ReactElement {
       loadedScreen?.close()
     }
   }, playerListenners)
-  const openPlaylitsSelector = React.useCallback(async (musicId: string) => {
-    loadedScreen?.open()
-    try {
-      const playlists = await playlistTable.list()
-      const playlistId = await playlistSelectorModal?.(playlists)
-      if (!playlistId) return
-      loadedScreen?.open()
-      await playlistTable.addToPlaylist(playlistId, musicId)
-      showMessage({
-        type: 'success',
-        message: 'Adicionado com sucesso!'
-      })
-    } catch (e) {
-      showMessage({
-        type: 'danger',
-        message: 'Erro ao tentar adicionar música a playlist!'
-      })
-    } finally {
-      loadedScreen?.close()
-    }
-  }, [])
+  const methods: Methods = {
+    deleteMusic,
+    removeFromActualMusicList: removeFromMusicList,
+    addMusicToPlaylist: openPlaylistSelector(
+      database,
+      loadedScreen,
+      showMessage,
+      playlistSelectorModal
+    ),
+    handleToArtist: goToArtists(navigation)
+  }
+
   const onMoreCallback = React.useCallback(
     (musicId: string) => {
       const music = reproductionList.find(
@@ -103,12 +90,7 @@ export default function HomeScreen(): React.ReactElement {
             name: music.artist.name
           }
         },
-        {
-          removeFromActualMusicList: removeFromMusicList,
-          deleteMusic,
-          handleToArtist,
-          addMusicToPlaylist: openPlaylitsSelector
-        }
+        methods
       )
     },
     [reproductionList]

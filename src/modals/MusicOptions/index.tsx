@@ -16,7 +16,7 @@ interface MusicData {
   }
   playlistItemId?: number
 }
-interface Methods {
+export interface Methods {
   handleToArtist?: (artistId: string) => void
   addMusicToPlaylist?: (musicId: string) => void
   removeFromActualMusicList?: (musicId: string) => void

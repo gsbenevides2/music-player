@@ -17,8 +17,14 @@ interface IDatabaseArtist {
   name: string
   coverUrl: string
 }
-export function useArtistTable(database: DatabaseService) {
-  const artistMethods = {
+export interface UseArtistsTable {
+  getArtist(id: string): Promise<IDatabaseArtist | null>
+  insert(id: string, name: string, coverUrl: string): Promise<void>
+  list(): Promise<IDatabaseArtist[]>
+  delete(artistId: string): Promise<void>
+}
+export function useArtistTable(database: DatabaseService): UseArtistsTable {
+  return {
     async getArtist(id: string): Promise<IDatabaseArtist | null> {
       const sqlResult = await database.execSQLQuery({
         sql: ['SELECT * FROM artists', 'WHERE id = ?'],
@@ -32,8 +38,8 @@ export function useArtistTable(database: DatabaseService) {
         return artist || null
       } else return null
     },
-    insert(id: string, name: string, coverUrl: string) {
-      return database.execSQLQuery({
+    async insert(id: string, name: string, coverUrl: string): Promise<void> {
+      await database.execSQLQuery({
         sql: ['INSERT INTO artists (id, name, coverUrl)', 'VALUES (?,?,?)'],
         args: [id, name, coverUrl]
       })
@@ -58,5 +64,4 @@ export function useArtistTable(database: DatabaseService) {
       })
     }
   }
-  return artistMethods
 }

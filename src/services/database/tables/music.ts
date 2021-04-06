@@ -31,7 +31,7 @@ export interface IDatabaseMusicLeftJoinArtists extends IDatabaseMusic {
   artistCoverUrl: string
 }
 
-interface UseMusicTableReturn {
+export interface UseMusicTableReturn {
   get: (id: string) => Promise<IMusic | null>
   insert: (
     id: string,

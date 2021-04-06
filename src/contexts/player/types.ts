@@ -38,6 +38,8 @@ export interface LoadedUsecontext {
   removeMusicFromMusicList: (musicId: string) => Promise<void>
   removeArtistFromMusicList: (artistId: string) => Promise<void>
   clearData: () => Promise<void>
+  addToMusicList: (music: IMusic) => void
+  addToNextMusicList: (music: IMusic) => void
   sound?: Audio.Sound
   musicActualy?: IMusic
   musicList?: IMusic[]

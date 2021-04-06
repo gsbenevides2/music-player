@@ -4,9 +4,14 @@ import * as MediaLibrary from 'expo-media-library'
 import * as Permisions from 'expo-permissions'
 import * as SQLite from 'expo-sqlite'
 
-import { ArtistsTable } from './tables/artists'
-import { MusicsTable } from './tables/music'
-import { PlaylistsTable, PlaylistsMusicsTable } from './tables/playlists'
+import { ArtistsTable, UseArtistsTable, useArtistTable } from './tables/artists'
+import { MusicsTable, useMusicTable, UseMusicTableReturn } from './tables/music'
+import {
+  PlaylistsTable,
+  PlaylistsMusicsTable,
+  UsePlaylistsReturns,
+  usePlaylistsTable
+} from './tables/playlists'
 import {
   DatabaseServiceImplementation,
   ExecSQLQueryReturn,
@@ -19,6 +24,19 @@ const fileUri = `${FileSystem.documentDirectory}SQLite/${dbName}`
 
 export class DatabaseService implements DatabaseServiceImplementation {
   _db = SQLite.openDatabase(dbName)
+  tables: {
+    artist: UseArtistsTable
+    music: UseMusicTableReturn
+    playlist: UsePlaylistsReturns
+  }
+
+  setTables(): void {
+    this.tables = {
+      artist: useArtistTable(this),
+      music: useMusicTable(this),
+      playlist: usePlaylistsTable(this)
+    }
+  }
 
   _parseQuery(query: Query): SQLite.Query {
     return {
