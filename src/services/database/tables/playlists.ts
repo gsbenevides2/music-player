@@ -146,14 +146,19 @@ export function usePlaylistsTable(
     },
     async getPlaylistsByMusic(musicId: string): Promise<number[]> {
       const sqlResult = await database.execSQLQuery({
-        sql: ['SELECT FROM playlists_musics.id', 'WHERE musicId = ?'],
+        sql: [
+          'SELECT playlists_musics.id FROM playlists_musics',
+          'WHERE musicId = ?'
+        ],
         args: [musicId]
       })
       if (sqlResult.error) {
         throw sqlResult.error
       } else if (sqlResult.result) {
         const resultSet = sqlResult.result as ResultSet
-        const rows = (resultSet.rows as unknown) as number[]
+        const rows = (resultSet.rows.map(
+          ({ id }): { id: number } => id
+        ) as unknown) as number[]
         return rows
       } else throw new Error('Erro Desconhecido')
     },
