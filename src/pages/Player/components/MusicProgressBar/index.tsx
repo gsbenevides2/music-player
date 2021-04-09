@@ -1,8 +1,8 @@
-// eslint-disable-next-line no-use-before-define
 import React from 'react'
+import { Colors } from 'react-native-paper'
 
 import Slider from '@react-native-community/slider'
-import { Colors } from 'react-native-paper'
+
 import { TimeTextAreaMemorized } from './textData'
 
 interface MusicProgressBarProps {

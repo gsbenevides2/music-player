@@ -1,4 +1,3 @@
-// eslint-disable-next-line no-use-before-define
 import React from 'react'
 import { Keyboard } from 'react-native'
 import { Portal, Dialog, Button, TextInput } from 'react-native-paper'

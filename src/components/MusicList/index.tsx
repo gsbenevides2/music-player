@@ -1,4 +1,3 @@
-// eslint-disable-next-line no-use-before-define
 import React from 'react'
 import { FlatList, Image } from 'react-native'
 import { List, IconButton } from 'react-native-paper'

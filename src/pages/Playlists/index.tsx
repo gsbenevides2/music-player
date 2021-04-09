@@ -1,4 +1,3 @@
-// eslint-disable-next-line no-use-before-define
 import React from 'react'
 import { FlatList, View, Image, DeviceEventEmitter } from 'react-native'
 import { showMessage } from 'react-native-flash-message'

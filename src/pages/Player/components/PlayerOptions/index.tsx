@@ -1,4 +1,3 @@
-// eslint-disable-next-line no-use-before-define
 import React from 'react'
 import { View } from 'react-native'
 import { IconButton } from 'react-native-paper'
@@ -42,10 +41,10 @@ export const PlayerOptions: React.FC<PlayerOptionsProps> = props => {
 
 export const PlayerOptionsMemorized = React.memo(PlayerOptions)
 /*
-      <IconButton
-        onPress={props.openMusicInfo}
-        icon="information-outline"
-        color="white"
-        size={20}
-      />
- */
+						<IconButton
+								onPress={props.openMusicInfo}
+								icon="information-outline"
+								color="white"
+								size={20}
+						/>
+	*/

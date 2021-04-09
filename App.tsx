@@ -1,4 +1,3 @@
-// eslint-disable-next-line no-use-before-define
 import React from 'react'
 import FlashMessage from 'react-native-flash-message'
 import { Provider, DarkTheme } from 'react-native-paper'

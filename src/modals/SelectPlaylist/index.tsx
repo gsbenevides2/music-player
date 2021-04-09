@@ -1,4 +1,3 @@
-// eslint-disable-next-line no-use-before-define
 import React from 'react'
 import { FlatList } from 'react-native-gesture-handler'
 import { List, Portal, Dialog } from 'react-native-paper'

@@ -1,4 +1,3 @@
-// eslint-disable-next-line no-use-before-define
 import React from 'react'
 import { View, Image } from 'react-native'
 import { TextInput, Title, Subheading } from 'react-native-paper'
@@ -104,13 +103,11 @@ const SelectMusicScreen: React.FC = () => {
           onEndReached={endOfList}
         />
         {!deezerData.musics.length && <NoMusic />}
-        {!deezerData.next && deezerData.musics.length
-? (
+        {!deezerData.next && deezerData.musics.length ? (
           <Title style={{ alignSelf: 'center', flex: 1 }}>
             Fim Dos Resultados
           </Title>
-        )
-: null}
+            ) : null}
       </View>
     </View>
   )
