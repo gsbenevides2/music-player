@@ -128,8 +128,8 @@ const Routes: React.FC = () => {
           component={PlaylistScreen}
         />
         <Stack.Screen
-          name="QRCodeShare"
-          options={{ title: 'Evie uma música' }}
+          name="QRCode"
+          options={{ title: 'Envie uma música' }}
           component={QRCodeShareScreen}
         />
       </Stack.Navigator>

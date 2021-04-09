@@ -6,6 +6,7 @@ import { DeleteMusicButton } from './DeleteMusicButton'
 import { GoToArtistButton } from './GoToArtistsButton'
 import { RemoveFromActualMusicListButton } from './RemoveFromActualMusicListButton'
 import { RemoveFromPlaylistButton } from './RemoveFromPlaylistButton'
+import { ShareInQRCodeButton } from './ShareInQRCodeButton'
 
 interface MusicData {
   id: string
@@ -22,6 +23,7 @@ export interface Methods {
   removeFromActualMusicList?: (musicId: string) => void
   removeMusicFromPlaylist?: (playlistItemId: number) => void
   deleteMusic?: (musicId: string) => void
+  shareInQRCode?: (musicId: string) => void
 }
 interface ContextState {
   visible: boolean
@@ -73,6 +75,11 @@ export const MusicOptionsProvider: React.FC = props => {
               musicId={state.data?.id}
               close={close}
               onPress={state.methods.removeFromActualMusicList}
+            />
+            <ShareInQRCodeButton
+              musicId={state.data?.id}
+              close={close}
+              onPress={state.methods.shareInQRCode}
             />
             <DeleteMusicButton
               musicId={state.data?.id}

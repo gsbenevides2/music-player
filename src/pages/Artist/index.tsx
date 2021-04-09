@@ -12,7 +12,8 @@ import { usePlayerContext } from '../../contexts/player/use'
 import { Methods, useMusicOptionsModal } from '../../modals/MusicOptions'
 import {
   openPlaylistSelector,
-  deleteMusic
+  deleteMusic,
+  shareInQRCode
 } from '../../modals/MusicOptions/hooks'
 import { useSelectPlaylistModal } from '../../modals/SelectPlaylist'
 import { useDatabase } from '../../services/database'
@@ -50,7 +51,8 @@ const ArtistScreen: React.FC = () => {
       playerContext,
       playerListenners,
       showMessage
-    )
+    ),
+    shareInQRCode: shareInQRCode(database, navigation)
   }
   const onMoreCallback = React.useCallback(
     async (musicId: string) => {

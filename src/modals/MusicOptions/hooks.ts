@@ -76,6 +76,17 @@ export const deleteMusic = (
   )
 }
 
+export const shareInQRCode = (
+  database: DatabaseService,
+  navigation: NavigationProp<ParamListBase>
+): ((musicId: string) => void) => {
+  return React.useCallback(async (musicId: string) => {
+    const music = await database.tables.music.get(musicId)
+    if (music) {
+      navigation.navigate('QRCode', { music })
+    }
+  }, [])
+}
 export const removeMusicFromPlaylist = (
   database: DatabaseService,
   loadedScreen: UseLoadFadedScreen,
