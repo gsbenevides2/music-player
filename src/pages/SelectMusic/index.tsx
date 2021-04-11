@@ -1,11 +1,12 @@
 import React from 'react'
-import { View, Image } from 'react-native'
-import { TextInput, Title, Subheading } from 'react-native-paper'
+import { View } from 'react-native'
+import { TextInput, Title } from 'react-native-paper'
 
 import { useRoute, useNavigation } from '@react-navigation/native'
 
 import { useLoadFadedScreen } from '../../components/LoadFadedScreen'
 import MusicList from '../../components/MusicList'
+import Warning from '../../components/Warning'
 import {
   DeezerService,
   IDeezerResult,
@@ -30,17 +31,35 @@ interface ScreenParams {
     videoId: string
   }
 }
-const NoMusic: React.FC = () => (
-  <View style={{ alignItems: 'center' }}>
-    <Image
-      resizeMode={'contain'}
-      style={{ width: '80%', height: '80%' }}
-      source={require('../../assets/not_found.png')}
-    />
-    <Title>Ops não encontrei nada</Title>
-    <Subheading>Verefique o nome da musica ou tente uma outra url</Subheading>
-  </View>
-)
+interface NotFoundProps {
+  show: boolean
+}
+const NotFound: React.FC<NotFoundProps> = ({ show }) => {
+  if (show) {
+    return (
+      <Warning
+        imageName="noData"
+        title="Ops! Não Encontrei Nada"
+        description="Verefique o nome da musica ou tente uma outra url."
+      />
+    )
+  } else {
+    return <React.Fragment />
+  }
+}
+
+interface EndOfListProps {
+  show: boolean
+}
+const EndOfList: React.FC<EndOfListProps> = ({ show }) => {
+  if (show) {
+    return (
+      <Title style={{ alignSelf: 'center', flex: 1 }}>Fim Dos Resultados</Title>
+    )
+  } else {
+    return <React.Fragment />
+  }
+}
 const SelectMusicScreen: React.FC = () => {
   const deezerService = new DeezerService()
   const { params } = useRoute()
@@ -102,12 +121,8 @@ const SelectMusicScreen: React.FC = () => {
           musics={deezerData.musics}
           onEndReached={endOfList}
         />
-        {!deezerData.musics.length && <NoMusic />}
-        {!deezerData.next && deezerData.musics.length ? (
-          <Title style={{ alignSelf: 'center', flex: 1 }}>
-            Fim Dos Resultados
-          </Title>
-            ) : null}
+        <NotFound show={!deezerData.musics.length} />
+        <EndOfList show={!deezerData.next && deezerData.musics.length > 0} />
       </View>
     </View>
   )

@@ -1,12 +1,13 @@
 import React from 'react'
-import { View, Image, DeviceEventEmitter } from 'react-native'
+import { View, DeviceEventEmitter } from 'react-native'
 import { showMessage } from 'react-native-flash-message'
-import { Title, Subheading, IconButton } from 'react-native-paper'
+import { IconButton } from 'react-native-paper'
 
 import { useRoute, useNavigation } from '@react-navigation/native'
 
 import { useLoadFadedScreen } from '../../components/LoadFadedScreen'
 import MusicListDrag from '../../components/MusicListDrag'
+import Warning from '../../components/Warning'
 import { getPlayerListenners } from '../../contexts/player/listenners'
 import { usePlayerContext } from '../../contexts/player/use'
 import { Methods, useMusicOptionsModal } from '../../modals/MusicOptions'
@@ -161,15 +162,11 @@ const PlaylistScreen: React.FC = () => {
     return <View />
   } else if (!musicList.length) {
     return (
-      <View style={{ alignItems: 'center' }}>
-        <Image
-          resizeMode={'contain'}
-          style={{ width: '80%', height: '80%' }}
-          source={require('../../assets/no_data.png')}
-        />
-        <Title>Playlist sem músicas</Title>
-        <Subheading>Tente colocar músicas nessa playlist</Subheading>
-      </View>
+      <Warning
+        imageName="noData"
+        title="Playlist Sem Músicas"
+        description="Tente colocar músicas nessa playlist."
+      />
     )
   } else {
     return (

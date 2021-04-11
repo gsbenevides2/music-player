@@ -69,6 +69,9 @@ const OptionsScreen: React.FC = () => {
   const handleToPlaylists = React.useCallback(() => {
     navigation.navigate('Playlists')
   }, [])
+  const handleToQRCode = React.useCallback(() => {
+    navigation.navigate('QRCodeReader')
+  }, [])
   const handleToResetApp = React.useCallback(async () => {
     const result = await confirmModal?.('Deseja realmente deletar tudo?')
     if (!result) {
@@ -138,6 +141,12 @@ const OptionsScreen: React.FC = () => {
         title="Adicionar Música"
         description="Adicione uma música a sua coleção."
         left={props => <List.Icon {...props} icon="plus" />}
+      />
+      <List.Item
+        onPress={handleToQRCode}
+        title="Adicionar Música via QRCode"
+        description="Adicione uma música atraves de código QR."
+        left={props => <List.Icon {...props} icon="qrcode" />}
       />
       <List.Item
         title="Ver Todas As Músicas"

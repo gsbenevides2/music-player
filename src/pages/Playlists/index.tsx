@@ -1,11 +1,12 @@
 import React from 'react'
-import { FlatList, View, Image, DeviceEventEmitter } from 'react-native'
+import { FlatList, View, DeviceEventEmitter } from 'react-native'
 import { showMessage } from 'react-native-flash-message'
-import { List, Title, Subheading, FAB, IconButton } from 'react-native-paper'
+import { List, FAB, IconButton } from 'react-native-paper'
 
 import { useNavigation } from '@react-navigation/native'
 
 import { useLoadFadedScreen } from '../../components/LoadFadedScreen'
+import Warning from '../../components/Warning'
 import { useInputModal } from '../../modals/Input'
 import { useDatabase } from '../../services/database'
 import { usePlaylistsTable } from '../../services/database/tables/playlists'
@@ -156,15 +157,11 @@ const PlaylistsScreen: React.FC = () => {
   } else if (playlists.length === 0) {
     return (
       <View style={{ flex: 1 }}>
-        <View style={{ alignItems: 'center' }}>
-          <Image
-            resizeMode={'contain'}
-            style={{ width: '80%', height: '80%' }}
-            source={require('../../assets/no_data.png')}
-          />
-          <Title>Você ainda não tem playlists</Title>
-          <Subheading>Clique no + e crie uma!</Subheading>
-        </View>
+        <Warning
+          imageName="noData"
+          title="Sem Playlists"
+          description="Clique no + e crie uma!"
+        />
         <FAB
           style={{
             position: 'absolute',

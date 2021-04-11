@@ -1,9 +1,9 @@
 import React from 'react'
-import { View, Image } from 'react-native'
-import { Subheading, Title } from 'react-native-paper'
 
 import NetInfo from '@react-native-community/netinfo'
 import { useNavigation } from '@react-navigation/native'
+
+import Warning from '../../components/Warning'
 
 export function onNetworkUpdatesInPlayer(): void {
   const navigation = useNavigation()
@@ -41,14 +41,10 @@ export function onNetworkUpdatesInNoNetwork(): void {
 export default function NoNetworkScreen(): React.ReactElement {
   onNetworkUpdatesInNoNetwork()
   return (
-    <View style={{ alignItems: 'center' }}>
-      <Image
-        resizeMode={'contain'}
-        style={{ width: '80%', height: '80%' }}
-        source={require('../../assets/no_network.png')}
-      />
-      <Title>Sem internet</Title>
-      <Subheading>Verifique sua coneção com a internet</Subheading>
-    </View>
+    <Warning
+      imageName="noNetwork"
+      title="Sem Internet"
+      description="Verifique sua conexão com a internet."
+    />
   )
 }

@@ -8,10 +8,11 @@ import {
   DeviceEventEmitter,
   RefreshControl
 } from 'react-native'
-import { Text, Title, Subheading } from 'react-native-paper'
+import { Text } from 'react-native-paper'
 
 import { useNavigation } from '@react-navigation/native'
 
+import Warning from '../../components/Warning'
 import { useDatabase } from '../../services/database'
 import { useArtistTable } from '../../services/database/tables/artists'
 import { IArtist } from '../../types'
@@ -88,15 +89,11 @@ const ArtistsScreen: React.FC = () => {
     return <View />
   } else if (artists.length === 0) {
     return (
-      <View style={{ alignItems: 'center' }}>
-        <Image
-          resizeMode={'contain'}
-          style={{ width: '80%', height: '80%' }}
-          source={require('../../assets/no_data.png')}
-        />
-        <Title>Sem músicas</Title>
-        <Subheading>Vá em "Opções" e clique em "Adicionar Música"</Subheading>
-      </View>
+      <Warning
+        imageName="noData"
+        title="Sem Músicas"
+        description='Vá em "Opções" e clique em "Adicionar Música".'
+      />
     )
   } else {
     return (

@@ -16,8 +16,7 @@ import { PlayerButtonsMemorized } from './components/PlayerButtons'
 import { PlayerOptionsMemorized } from './components/PlayerOptions'
 import styles from './styles'
 
-// eslint-disable-next-line @typescript-eslint/explicit-module-boundary-types
-export default function PlayerScreen() {
+const PlayerScreen: React.FC = () => {
   const navigation = useNavigation()
   const player = usePlayerContext()
   const horizontal = useHorizontal()
@@ -116,7 +115,7 @@ export default function PlayerScreen() {
     </View>
   )
 }
-
+export default PlayerScreen
 /*
 	* Old Code for future implementation
 import MusicInfo, { useMusicInfo } from '../../modals/MusicInfo'

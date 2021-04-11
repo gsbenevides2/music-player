@@ -1,12 +1,13 @@
 import React from 'react'
-import { View, ImageBackground, Image, DeviceEventEmitter } from 'react-native'
+import { View, ImageBackground, DeviceEventEmitter } from 'react-native'
 import { showMessage } from 'react-native-flash-message'
-import { Title, Subheading, IconButton } from 'react-native-paper'
+import { IconButton } from 'react-native-paper'
 
 import { useNavigation, useRoute } from '@react-navigation/native'
 
 import { useLoadFadedScreen } from '../../components/LoadFadedScreen'
 import MusicList from '../../components/MusicList'
+import Warning from '../../components/Warning'
 import { getPlayerListenners } from '../../contexts/player/listenners'
 import { usePlayerContext } from '../../contexts/player/use'
 import { Methods, useMusicOptionsModal } from '../../modals/MusicOptions'
@@ -139,17 +140,13 @@ const ArtistScreen: React.FC = () => {
           source={{ uri: artist.coverUrl.replace('1000x1000', '800x800') }}
           style={styles.container}
         >
-          <View style={{ ...styles.overlay, alignItems: 'center' }}>
-            <Image
-              resizeMode={'contain'}
-              style={{ width: '80%', height: '80%' }}
-              source={require('../../assets/no_data.png')}
-            />
-            <Title>Sem músicas</Title>
-            <Subheading>
-              Este artista nāo tem músicas em sua biblioteca
-            </Subheading>
-          </View>
+          <Warning
+            imageName="noData"
+            title="Sem Músicas"
+            description="Este artista nāo tem músicas em sua biblioteca."
+            overlay
+            fullSize
+          />
         </ImageBackground>
       </View>
     )

@@ -20,6 +20,8 @@
     "expo-app-loading": "^1.0.1",
     "expo-asset": "~8.2.1",
     "expo-av": "~8.7.0",
+    "expo-barcode-scanner": "~9.1.0",
+    "expo-camera": "~9.1.0",
     "expo-document-picker": "~8.4.1",
     "expo-file-system": "~9.3.0",
     "expo-media-library": "~10.0.0",

@@ -83,7 +83,7 @@ export const shareInQRCode = (
   return React.useCallback(async (musicId: string) => {
     const music = await database.tables.music.get(musicId)
     if (music) {
-      navigation.navigate('QRCode', { music })
+      navigation.navigate('QRCodeShare', { music })
     }
   }, [])
 }

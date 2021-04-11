@@ -1,12 +1,12 @@
 import React from 'react'
-import { View, Image, DeviceEventEmitter } from 'react-native'
+import { View, DeviceEventEmitter } from 'react-native'
 import { showMessage } from 'react-native-flash-message'
-import { Title, Subheading } from 'react-native-paper'
 
 import { useNavigation } from '@react-navigation/native'
 
 import { useLoadFadedScreen } from '../../components/LoadFadedScreen'
 import MusicList from '../../components/MusicList'
+import Warning from '../../components/Warning'
 import { getPlayerListenners } from '../../contexts/player/listenners'
 import { usePlayerContext } from '../../contexts/player/use'
 import { Methods, useMusicOptionsModal } from '../../modals/MusicOptions'
@@ -18,20 +18,6 @@ import {
 import { useSelectPlaylistModal } from '../../modals/SelectPlaylist'
 import { useDatabase } from '../../services/database'
 import { IMusic } from '../../types'
-
-const NoMusic: React.FC = () => (
-  <View style={{ alignItems: 'center' }}>
-    <Image
-      resizeMode={'contain'}
-      style={{ width: '80%', height: '80%' }}
-      source={require('../../assets/no_data.png')}
-    />
-    <Title>Sem músicas</Title>
-    <Subheading>
-      {'Volte a pagina anterior e clique em "Adicionar Música"'}
-    </Subheading>
-  </View>
-)
 
 const AllMusicsScreen: React.FC = () => {
   const loadedScreen = useLoadFadedScreen()
@@ -111,7 +97,13 @@ const AllMusicsScreen: React.FC = () => {
   if (musicList === undefined) {
     return <View />
   } else if (!musicList.length) {
-    return <NoMusic />
+    return (
+      <Warning
+        imageName="noData"
+        title="Sem Músicas"
+        description='Vá em "Opções" e clique em "Adicionar Música".'
+      />
+    )
   } else {
     return (
       <View>

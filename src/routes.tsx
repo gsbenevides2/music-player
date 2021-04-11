@@ -14,6 +14,7 @@ import OptionsScreen from './pages/Options'
 import PlayerScreen from './pages/Player'
 import PlaylistScreen from './pages/Playlist'
 import PlaylistsScreen from './pages/Playlists'
+import QRCodeReaderScreen from './pages/QRCodeReader'
 import { QRCodeShareScreen } from './pages/QRCodeShare'
 import ReproductionListScreen from './pages/ReproductionList'
 import SelectMusicScreen from './pages/SelectMusic'
@@ -128,9 +129,14 @@ const Routes: React.FC = () => {
           component={PlaylistScreen}
         />
         <Stack.Screen
-          name="QRCode"
+          name="QRCodeShare"
           options={{ title: 'Envie uma música' }}
           component={QRCodeShareScreen}
+        />
+        <Stack.Screen
+          name="QRCodeReader"
+          options={{ title: 'Receba uma música' }}
+          component={QRCodeReaderScreen}
         />
       </Stack.Navigator>
     </NavigationContainer>

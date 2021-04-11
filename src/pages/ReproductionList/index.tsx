@@ -1,12 +1,12 @@
 import React from 'react'
-import { View, Image } from 'react-native'
+import { View } from 'react-native'
 import { showMessage } from 'react-native-flash-message'
-import { Title, Subheading } from 'react-native-paper'
 
 import { useNavigation } from '@react-navigation/native'
 
 import { useLoadFadedScreen } from '../../components/LoadFadedScreen'
 import MusicListDrag from '../../components/MusicListDrag'
+import Warning from '../../components/Warning'
 import { getPlayerListenners } from '../../contexts/player/listenners'
 import { usePlayerContext } from '../../contexts/player/use'
 import { Methods, useMusicOptionsModal } from '../../modals/MusicOptions'
@@ -18,18 +18,7 @@ import { useSelectPlaylistModal } from '../../modals/SelectPlaylist'
 import { useDatabase } from '../../services/database'
 import { IMusic } from '../../types'
 
-const NotPlaying: React.FC = () => (
-  <View style={{ alignItems: 'center' }}>
-    <Image
-      resizeMode={'contain'}
-      style={{ width: '80%', height: '80%' }}
-      source={require('../../assets/no_music.png')}
-    />
-    <Title>Não está tocando nada</Title>
-    <Subheading>Tente colocar uma múscia para tocar</Subheading>
-  </View>
-)
-export default function HomeScreen(): React.ReactElement {
+export default function ReproductionListScreen(): React.ReactElement {
   const loadedScreen = useLoadFadedScreen()
   const database = useDatabase()
   const navigation = useNavigation()
@@ -128,6 +117,12 @@ export default function HomeScreen(): React.ReactElement {
       </View>
     )
   } else {
-    return <NotPlaying />
+    return (
+      <Warning
+        imageName="noMusic"
+        title="Não Está Tocando Nada"
+        description="Tente colocar uma múscia para tocar."
+      />
+    )
   }
 }
