@@ -9,6 +9,7 @@ import MusicList from '../../components/MusicList'
 import Warning from '../../components/Warning'
 import { getPlayerListenners } from '../../contexts/player/listenners'
 import { usePlayerContext } from '../../contexts/player/use'
+import { useTimerContext } from '../../contexts/timer'
 import { Methods, useMusicOptionsModal } from '../../modals/MusicOptions'
 import {
   openPlaylistSelector,
@@ -28,6 +29,7 @@ const AllMusicsScreen: React.FC = () => {
   const playerContext = usePlayerContext()
   const musicOptions = useMusicOptionsModal()
   const playerListenners = getPlayerListenners(playerContext)
+  const timer = useTimerContext()
   const musicInfoMethods: Methods = {
     addMusicToPlaylist: openPlaylistSelector(
       database,
@@ -42,6 +44,7 @@ const AllMusicsScreen: React.FC = () => {
       musicList,
       playerContext,
       playerListenners,
+      timer,
       showMessage
     ),
     handleToArtist: goToArtists(navigation)

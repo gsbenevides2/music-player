@@ -10,6 +10,8 @@ import MusicList from '../../components/MusicList'
 import Warning from '../../components/Warning'
 import { getPlayerListenners } from '../../contexts/player/listenners'
 import { usePlayerContext } from '../../contexts/player/use'
+import { useTimerContext } from '../../contexts/timer'
+import { LoadedUsecontext } from '../../contexts/timer/types'
 import { Methods, useMusicOptionsModal } from '../../modals/MusicOptions'
 import {
   openPlaylistSelector,
@@ -37,6 +39,7 @@ const ArtistScreen: React.FC = () => {
   const playlistSelectorModal = useSelectPlaylistModal()
   const { artistId } = route.params as ScreenParams
   const musicOptions = useMusicOptionsModal()
+  const timer = useTimerContext()
   const musicInfoCallbacks: Methods = {
     addMusicToPlaylist: openPlaylistSelector(
       database,
@@ -51,6 +54,7 @@ const ArtistScreen: React.FC = () => {
       musicList,
       playerContext,
       playerListenners,
+      timer,
       showMessage
     ),
     shareInQRCode: shareInQRCode(database, navigation)

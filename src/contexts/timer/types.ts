@@ -12,8 +12,10 @@ export interface ContextInterface {
 
 export type ContextType = undefined | ContextInterface
 
-export interface LoadedUsecontext {
-  set: (to: number, from: number) => void
-  timeDataTo?: number
-  timeDataFrom?: number
-}
+export type LoadedUseTimeContext =
+  | {
+      set: (to: number, from: number) => void
+      timeDataTo?: number
+      timeDataFrom?: number
+    }
+  | undefined

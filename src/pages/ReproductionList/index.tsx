@@ -9,6 +9,7 @@ import MusicListDrag from '../../components/MusicListDrag'
 import Warning from '../../components/Warning'
 import { getPlayerListenners } from '../../contexts/player/listenners'
 import { usePlayerContext } from '../../contexts/player/use'
+import { useTimerContext } from '../../contexts/timer'
 import { Methods, useMusicOptionsModal } from '../../modals/MusicOptions'
 import {
   goToArtists,
@@ -26,11 +27,14 @@ export default function ReproductionListScreen(): React.ReactElement {
   const playerListenners = getPlayerListenners(player)
   const musicOptions = useMusicOptionsModal()
   const playlistSelectorModal = useSelectPlaylistModal()
-  const [reproductionList, setReproductionList] = React.useState<IMusic[]>([])
+  const [reproductionList, setReproductionList] = React.useState<IMusic[]>()
+  const timer = useTimerContext()
+
   const deleteMusic = React.useCallback(async (musicId: string) => {
     loadedScreen?.open()
     try {
       await database.tables.music.delete(musicId)
+      timer?.set(0, 0)
       await player.removeMusicFromMusicList(musicId)
       showMessage({
         message: 'Deletado com sucesso',
@@ -49,6 +53,7 @@ export default function ReproductionListScreen(): React.ReactElement {
     loadedScreen?.open()
     try {
       await player.removeMusicFromMusicList(musicId)
+      timer?.set(0, 0)
     } finally {
       loadedScreen?.close()
     }
@@ -67,7 +72,7 @@ export default function ReproductionListScreen(): React.ReactElement {
 
   const onMoreCallback = React.useCallback(
     (musicId: string) => {
-      const music = reproductionList.find(
+      const music = reproductionList?.find(
         music => music.id === musicId
       ) as IMusic
       musicOptions?.open(
@@ -105,7 +110,9 @@ export default function ReproductionListScreen(): React.ReactElement {
   React.useEffect(() => {
     setReproductionList(player.musicList || [])
   }, [player.musicList])
-  if (reproductionList.length) {
+  if (reproductionList === undefined) {
+    return <View />
+  } else if (reproductionList.length) {
     return (
       <View style={{ flex: 1 }}>
         <MusicListDrag
@@ -119,7 +126,7 @@ export default function ReproductionListScreen(): React.ReactElement {
   } else {
     return (
       <Warning
-        imageName="noMusic"
+        imageName="music"
         title="Não Está Tocando Nada"
         description="Tente colocar uma múscia para tocar."
       />

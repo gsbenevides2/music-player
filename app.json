@@ -1,32 +1,48 @@
 {
-  "expo": {
-    "name": "Musicius",
-    "slug": "musicius",
-    "version": "2.0.0",
-    "icon": "./assets/icon.png",
-    "splash": {
-      "image": "./assets/splash.png",
-      "resizeMode": "contain",
-      "backgroundColor": "#000000"
-    },
-    "backgroundColor": "#000000",
-		"userInterfaceStyle":"dark",
-    "updates": {
-      "fallbackToCacheTimeout": 0
-    },
-    "assetBundlePatterns": [
-      "**/*"
-    ],
-    "android": {
-		 "package": "com.gsbenevides.musicius",
-      "adaptiveIcon": { 
-        "foregroundImage": "./assets/foreground.png",
-        "backgroundColor": "#5E35B1"
-      },
-			"versionCode": 1
-    },
-		"androidStatusBar":{
-			"barStyle":"light-content"
-		}
-  }
+ "expo": {
+	"name": "Musicius",
+	"slug": "musicius",
+	"version": "2.0.0",
+	"icon": "./assets/icon.png",
+	"splash": {
+	 "image": "./assets/splash.png",
+	 "resizeMode": "contain",
+	 "backgroundColor": "#000000"
+	},
+	"backgroundColor": "#000000",
+	"userInterfaceStyle":"dark",
+	"updates": {
+	 "fallbackToCacheTimeout": 0
+	},
+	"assetBundlePatterns": [
+	 "**/*"
+	],
+	"android": {
+	 "package": "com.gsbenevides.musicius",
+	 "adaptiveIcon": { 
+		"foregroundImage": "./assets/foreground.png",
+		"backgroundColor": "#5E35B1"
+	 },
+	 "versionCode": 1
+	},
+	"androidStatusBar":{
+	 "barStyle":"light-content"
+	},
+	"packagerOpts": {
+	 "config": "metro.config.js",
+	 "sourceExts": [
+		"expo.ts",
+		"expo.tsx",
+		"expo.js",
+		"expo.jsx",
+		"ts",
+		"tsx",
+		"js",
+		"jsx",
+		"json",
+		"wasm",
+		"svg"
+	 ]
+	}		
+ }
 }

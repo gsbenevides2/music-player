@@ -8,6 +8,7 @@
     "eject": "expo eject"
   },
   "dependencies": {
+    "@expo/metro-config": "^0.1.61",
     "@react-native-async-storage/async-storage": "^1.13.2",
     "@react-native-community/masked-view": "0.1.10",
     "@react-native-community/netinfo": "5.9.7",
@@ -42,6 +43,7 @@
     "react-native-safe-area-context": "3.1.9",
     "react-native-screens": "~2.15.2",
     "react-native-svg": "12.1.0",
+    "react-native-svg-transformer": "^0.14.3",
     "react-native-web": "~0.13.12",
     "react-native-ytdl": "^4.2.1"
   },

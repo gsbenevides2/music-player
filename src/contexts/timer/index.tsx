@@ -2,7 +2,7 @@ import React from 'react'
 
 import AsyncStorage from '@react-native-async-storage/async-storage'
 
-import { ContextType, TimerState, LoadedUsecontext } from './types'
+import { ContextType, TimerState, LoadedUseTimeContext } from './types'
 
 export const TimerContext = React.createContext<ContextType>(undefined)
 
@@ -41,7 +41,7 @@ export const TimerProvider: React.FC = ({ children }) => {
     </TimerContext.Provider>
   )
 }
-export function useTimerContext(): LoadedUsecontext | undefined {
+export function useTimerContext(): LoadedUseTimeContext {
   const context = React.useContext(TimerContext)
   return context
     ? {

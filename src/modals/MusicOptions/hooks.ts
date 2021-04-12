@@ -6,6 +6,7 @@ import type { ParamListBase } from '@react-navigation/routers'
 
 import { UseLoadFadedScreen } from '../../components/LoadFadedScreen'
 import { LoadedUsecontext } from '../../contexts/player/types'
+import { LoadedUseTimeContext } from '../../contexts/timer/types'
 import { DatabaseService } from '../../services/database/databaseService'
 import { IMusic, IMusicInPlaylist } from '../../types'
 import { UseSelectPlaylistModalReturn } from '../SelectPlaylist'
@@ -32,6 +33,7 @@ export const deleteMusic = (
   musicList: IMusic[] | IMusicInPlaylist[] | undefined,
   playerContext: LoadedUsecontext,
   playerListenners: unknown[],
+  timer: LoadedUseTimeContext,
   showMessage: ShowMessageType
 ): ((musicId: string) => void) => {
   return React.useCallback(
@@ -58,6 +60,7 @@ export const deleteMusic = (
           await Promise.all(playlists.map(reorderPlaylists))
           setMusicList(musicList?.filter(music => music.id !== musicId))
           await playerContext.removeMusicFromMusicList(musicId)
+          timer.set(0, 0)
           loadedScreen?.close()
           showMessage({
             type: 'success',

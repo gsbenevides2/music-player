@@ -10,6 +10,7 @@ import MusicListDrag from '../../components/MusicListDrag'
 import Warning from '../../components/Warning'
 import { getPlayerListenners } from '../../contexts/player/listenners'
 import { usePlayerContext } from '../../contexts/player/use'
+import { useTimerContext } from '../../contexts/timer'
 import { Methods, useMusicOptionsModal } from '../../modals/MusicOptions'
 import {
   deleteMusic,
@@ -35,6 +36,7 @@ const PlaylistScreen: React.FC = () => {
   const playerListenners = getPlayerListenners(playerContext)
   const musicOptions = useMusicOptionsModal()
   const playlistSelectorModal = useSelectPlaylistModal()
+  const timer = useTimerContext()
 
   const musicInfoCallbacks: Methods = {
     addMusicToPlaylist: openPlaylistSelector(
@@ -52,6 +54,7 @@ const PlaylistScreen: React.FC = () => {
       musicList,
       playerContext,
       playerListenners,
+      timer,
       showMessage
     ),
     removeMusicFromPlaylist: removeMusicFromPlaylist(

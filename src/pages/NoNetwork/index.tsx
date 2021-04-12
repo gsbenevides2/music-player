@@ -42,7 +42,7 @@ export default function NoNetworkScreen(): React.ReactElement {
   onNetworkUpdatesInNoNetwork()
   return (
     <Warning
-      imageName="noNetwork"
+      imageName="signalSearching"
       title="Sem Internet"
       description="Verifique sua conexão com a internet."
     />

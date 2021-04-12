@@ -10,6 +10,7 @@ import * as WebBrowser from 'expo-web-browser'
 import { useLoadFadedScreen } from '../../components/LoadFadedScreen'
 import { getPlayerListenners } from '../../contexts/player/listenners'
 import { usePlayerContext } from '../../contexts/player/use'
+import { useTimerContext } from '../../contexts/timer'
 import { useConfirmModal } from '../../modals/Confirm'
 import { useInputModal } from '../../modals/Input'
 import { useDatabase } from '../../services/database'
@@ -26,6 +27,7 @@ const OptionsScreen: React.FC = () => {
   const player = usePlayerContext()
   const playerListenners = getPlayerListenners(player)
   const inputModal = useInputModal()
+  const timer = useTimerContext()
   const confirmModal = useConfirmModal()
 
   const handleToOpenModal = React.useCallback(() => {
@@ -80,6 +82,7 @@ const OptionsScreen: React.FC = () => {
         message: 'Operação cancelada!'
       })
     }
+    timer?.set(0, 0)
     await player.clearData()
     await database.deleteDb()
     await AsyncStorage.clear()
