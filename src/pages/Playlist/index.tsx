@@ -14,8 +14,10 @@ import { useTimerContext } from '../../contexts/timer'
 import { Methods, useMusicOptionsModal } from '../../modals/MusicOptions'
 import {
   deleteMusic,
+  goToArtists,
   openPlaylistSelector,
-  removeMusicFromPlaylist
+  removeMusicFromPlaylist,
+  shareInQRCode
 } from '../../modals/MusicOptions/hooks'
 import { useSelectPlaylistModal } from '../../modals/SelectPlaylist'
 import { useDatabase } from '../../services/database'
@@ -63,7 +65,9 @@ const PlaylistScreen: React.FC = () => {
       setMusicList,
       musicList,
       showMessage
-    )
+    ),
+    shareInQRCode: shareInQRCode(database, navigation),
+    handleToArtist: goToArtists(navigation)
   }
 
   const onMoreCallback = React.useCallback(
@@ -166,7 +170,7 @@ const PlaylistScreen: React.FC = () => {
   } else if (!musicList.length) {
     return (
       <Warning
-        imageName="noData"
+        imageName="space"
         title="Playlist Sem Músicas"
         description="Tente colocar músicas nessa playlist."
       />

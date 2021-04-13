@@ -150,7 +150,7 @@ const PlaylistsScreen: React.FC = () => {
         onPress={handleToPlaylistScreen}
       />
     ),
-    []
+    [handleDeletePlaylist]
   )
   if (playlists === undefined) {
     return <View />

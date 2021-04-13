@@ -13,7 +13,8 @@ import { useTimerContext } from '../../contexts/timer'
 import { Methods, useMusicOptionsModal } from '../../modals/MusicOptions'
 import {
   goToArtists,
-  openPlaylistSelector
+  openPlaylistSelector,
+  shareInQRCode
 } from '../../modals/MusicOptions/hooks'
 import { useSelectPlaylistModal } from '../../modals/SelectPlaylist'
 import { useDatabase } from '../../services/database'
@@ -67,7 +68,8 @@ export default function ReproductionListScreen(): React.ReactElement {
       showMessage,
       playlistSelectorModal
     ),
-    handleToArtist: goToArtists(navigation)
+    handleToArtist: goToArtists(navigation),
+    shareInQRCode: shareInQRCode(database, navigation)
   }
 
   const onMoreCallback = React.useCallback(

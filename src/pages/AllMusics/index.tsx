@@ -15,7 +15,8 @@ import { Methods, useMusicOptionsModal } from '../../modals/MusicOptions'
 import {
   openPlaylistSelector,
   deleteMusic,
-  goToArtists
+  goToArtists,
+  shareInQRCode
 } from '../../modals/MusicOptions/hooks'
 import { useSelectPlaylistModal } from '../../modals/SelectPlaylist'
 import { useDatabase } from '../../services/database'
@@ -68,7 +69,8 @@ const AllMusicsScreen: React.FC = () => {
       timer,
       showMessage
     ),
-    handleToArtist: goToArtists(navigation)
+    handleToArtist: goToArtists(navigation),
+    shareInQRCode: shareInQRCode(database, navigation)
   }
   const onMoreCallback = React.useCallback(
     async (musicId: string) => {
