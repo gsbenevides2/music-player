@@ -4,6 +4,7 @@ import { showMessage } from 'react-native-flash-message'
 
 import { useNavigation } from '@react-navigation/native'
 
+import HeaderSearch, { useHeaderSearch } from '../../components/HeaderSearch'
 import { useLoadFadedScreen } from '../../components/LoadFadedScreen'
 import MusicList from '../../components/MusicList'
 import Warning from '../../components/Warning'
@@ -24,12 +25,32 @@ const AllMusicsScreen: React.FC = () => {
   const loadedScreen = useLoadFadedScreen()
   const navigation = useNavigation()
   const [musicList, setMusicList] = React.useState<IMusic[]>()
+  const [musicListSearch, setMusicListSearch] = React.useState<IMusic[]>()
   const database = useDatabase()
   const playlistSelectorModal = useSelectPlaylistModal()
   const playerContext = usePlayerContext()
   const musicOptions = useMusicOptionsModal()
   const playerListenners = getPlayerListenners(playerContext)
   const timer = useTimerContext()
+  const onTextToSearch = React.useCallback(
+    (text: string) => {
+      setMusicListSearch(
+        musicList?.filter(music => {
+          return music.name.toLowerCase().includes(text.toLowerCase())
+        })
+      )
+    },
+    [musicList]
+  )
+  useHeaderSearch({
+    navigation,
+    placeholder: 'Procurar músicas:',
+    onText: onTextToSearch,
+    back: () => {
+      setMusicListSearch(undefined)
+    }
+  })
+
   const musicInfoMethods: Methods = {
     addMusicToPlaylist: openPlaylistSelector(
       database,
@@ -93,6 +114,7 @@ const AllMusicsScreen: React.FC = () => {
       'update-music-list',
       load
     )
+
     return () => {
       DeviceEventEmitter.removeSubscription(subscription)
     }
@@ -107,6 +129,26 @@ const AllMusicsScreen: React.FC = () => {
         description='Vá em "Opções" e clique em "Adicionar Música".'
       />
     )
+  } else if (musicListSearch !== undefined) {
+    if (musicListSearch.length) {
+      return (
+        <View>
+          <MusicList
+            onMore={onMoreCallback}
+            musics={musicListSearch}
+            onPress={musicPressCallback}
+          />
+        </View>
+      )
+    } else {
+      return (
+        <Warning
+          imageName="notFound"
+          title="Não Encontrado"
+          description="Não comsegui encontrar o que você procura."
+        />
+      )
+    }
   } else {
     return (
       <View>

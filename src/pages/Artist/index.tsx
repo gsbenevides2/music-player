@@ -1,7 +1,7 @@
 import React from 'react'
 import { View, ImageBackground, DeviceEventEmitter } from 'react-native'
 import { showMessage } from 'react-native-flash-message'
-import { IconButton } from 'react-native-paper'
+import { Appbar } from 'react-native-paper'
 
 import { useNavigation, useRoute } from '@react-navigation/native'
 
@@ -11,7 +11,6 @@ import Warning from '../../components/Warning'
 import { getPlayerListenners } from '../../contexts/player/listenners'
 import { usePlayerContext } from '../../contexts/player/use'
 import { useTimerContext } from '../../contexts/timer'
-import { LoadedUsecontext } from '../../contexts/timer/types'
 import { Methods, useMusicOptionsModal } from '../../modals/MusicOptions'
 import {
   openPlaylistSelector,
@@ -117,7 +116,7 @@ const ArtistScreen: React.FC = () => {
       const artist = await database.tables.artist.getArtist(artistId)
       setArtist(artist)
       const HeaderRight = () => (
-        <IconButton icon="delete" onPress={onDeleteArtist} size={25} />
+        <Appbar.Action icon="delete" onPress={onDeleteArtist} size={25} />
       )
 
       if (artist) {

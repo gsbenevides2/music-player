@@ -1,7 +1,7 @@
 import React from 'react'
 import { View, DeviceEventEmitter } from 'react-native'
 import { showMessage } from 'react-native-flash-message'
-import { IconButton } from 'react-native-paper'
+import { Appbar } from 'react-native-paper'
 
 import { useRoute, useNavigation } from '@react-navigation/native'
 
@@ -145,7 +145,7 @@ const PlaylistScreen: React.FC = () => {
     async function setPlaylistNameHeader() {
       const result = await database.tables.playlist.get(playlistId)
       const RightHeaderButton = () => (
-        <IconButton icon="delete" onPress={deletePlaylist} size={25} />
+        <Appbar.Action icon="delete" onPress={deletePlaylist} size={25} />
       )
       if (result) {
         navigation.setOptions({

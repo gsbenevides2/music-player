@@ -5,6 +5,7 @@ import { createMaterialBottomTabNavigator } from '@react-navigation/material-bot
 import { NavigationContainer, DarkTheme } from '@react-navigation/native'
 import { createStackNavigator } from '@react-navigation/stack'
 
+import Header from './components/Header'
 import AllMusicsScreen from './pages/AllMusics'
 import ArtistScreen from './pages/Artist'
 import ArtistsScreen from './pages/Artists'
@@ -19,6 +20,7 @@ import { QRCodeShareScreen } from './pages/QRCodeShare'
 import ReproductionListScreen from './pages/ReproductionList'
 import SelectMusicScreen from './pages/SelectMusic'
 import SplashScreen from './pages/Splash'
+
 function TabsRoutes() {
   const Tabs = createMaterialBottomTabNavigator()
   return (
@@ -65,7 +67,11 @@ const Routes: React.FC = () => {
   const Stack = createStackNavigator()
   return (
     <NavigationContainer theme={DarkTheme}>
-      <Stack.Navigator>
+      <Stack.Navigator
+        screenOptions={{
+          header: Header
+        }}
+      >
         <Stack.Screen
           name="splash"
           options={{
