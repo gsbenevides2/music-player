@@ -60,7 +60,7 @@ export const deleteMusic = (
           await Promise.all(playlists.map(reorderPlaylists))
           setMusicList(musicList?.filter(music => music.id !== musicId))
           await playerContext.removeMusicFromMusicList(musicId)
-          timer.set(0, 0)
+          timer?.set(0, 0)
           loadedScreen?.close()
           showMessage({
             type: 'success',
